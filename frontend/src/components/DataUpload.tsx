@@ -9,20 +9,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { 
   Upload, 
   File, 
-  Satellite, 
   Map, 
   CheckCircle, 
   AlertTriangle,
-  Loader2,
-  FileImage,
-  FileText
+  Loader2
 } from 'lucide-react';
 
-interface DataUploadProps {
+interface BoundaryUploadProps {
   onDataUploaded: (data: any) => void;
 }
 
-export function DataUpload({ onDataUploaded }: DataUploadProps) {
+export function BoundaryUpload({ onDataUploaded }: BoundaryUploadProps) {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
@@ -55,7 +52,6 @@ export function DataUpload({ onDataUploaded }: DataUploadProps) {
       setIsProcessing(false);
       setUploadProgress(0);
       
-      // Mock analysis results based on uploaded data
       const mockResults = {
         totalMiningArea: 420.5 + Math.random() * 100,
         authorizedArea: 350.2 + Math.random() * 50,
@@ -71,9 +67,7 @@ export function DataUpload({ onDataUploaded }: DataUploadProps) {
   };
 
   const supportedFormats = {
-    satellite: ['.tif', '.tiff', '.jp2', '.hdf'],
-    boundaries: ['.shp', '.kml', '.kmz', '.geojson'],
-    dem: ['.tif', '.tiff', '.hgt', '.dem']
+    boundaries: ['.shp', '.kml', '.kmz', '.geojson']
   };
 
   return (
@@ -83,45 +77,19 @@ export function DataUpload({ onDataUploaded }: DataUploadProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Upload className="h-5 w-5" />
-              Data Upload & Processing
+              Boundaries Upload
             </CardTitle>
             <CardDescription>
-              Upload satellite imagery, DEM data, and boundary files for automated mining detection analysis
+              Upload mining lease boundary files for automated analysis
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="satellite" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="satellite">Satellite Data</TabsTrigger>
-                <TabsTrigger value="boundaries">Boundaries</TabsTrigger>
-                <TabsTrigger value="dem">DEM Data</TabsTrigger>
+            <Tabs defaultValue="upload" className="w-full">
+              <TabsList className="w-full">
+                <TabsTrigger value="upload">Upload New</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="satellite" className="space-y-4">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
-                  <Satellite className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                  <div className="space-y-2">
-                    <Label htmlFor="satellite-upload" className="text-lg font-medium cursor-pointer">
-                      Upload Satellite Imagery
-                    </Label>
-                    <p className="text-sm text-gray-500">
-                      EO/SAR data in TIFF, JP2, or HDF format
-                    </p>
-                    <Input
-                      id="satellite-upload"
-                      type="file"
-                      accept={supportedFormats.satellite.join(',')}
-                      onChange={(e) => handleFileUpload(e, 'satellite')}
-                      className="mt-4"
-                    />
-                  </div>
-                </div>
-                <div className="text-xs text-gray-500">
-                  Supported formats: {supportedFormats.satellite.join(', ')}
-                </div>
-              </TabsContent>
-
-              <TabsContent value="boundaries" className="space-y-4">
+              <TabsContent value="upload" className="space-y-4">
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
                   <Map className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                   <div className="space-y-2">
@@ -144,30 +112,6 @@ export function DataUpload({ onDataUploaded }: DataUploadProps) {
                   Supported formats: {supportedFormats.boundaries.join(', ')}
                 </div>
               </TabsContent>
-
-              <TabsContent value="dem" className="space-y-4">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
-                  <FileImage className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                  <div className="space-y-2">
-                    <Label htmlFor="dem-upload" className="text-lg font-medium cursor-pointer">
-                      Upload DEM Data
-                    </Label>
-                    <p className="text-sm text-gray-500">
-                      Digital Elevation Model for depth and volume calculation
-                    </p>
-                    <Input
-                      id="dem-upload"
-                      type="file"
-                      accept={supportedFormats.dem.join(',')}
-                      onChange={(e) => handleFileUpload(e, 'dem')}
-                      className="mt-4"
-                    />
-                  </div>
-                </div>
-                <div className="text-xs text-gray-500">
-                  Supported formats: {supportedFormats.dem.join(', ')}
-                </div>
-              </TabsContent>
             </Tabs>
           </CardContent>
         </Card>
@@ -185,7 +129,7 @@ export function DataUpload({ onDataUploaded }: DataUploadProps) {
               <div className="space-y-4">
                 <Progress value={uploadProgress} className="w-full" />
                 <div className="flex justify-between text-sm text-gray-600">
-                  <span>Analyzing satellite imagery and DEM data...</span>
+                  <span>Analyzing boundary data...</span>
                   <span>{uploadProgress}%</span>
                 </div>
                 <Alert>
@@ -213,9 +157,7 @@ export function DataUpload({ onDataUploaded }: DataUploadProps) {
                 {uploadedFiles.map((file, index) => (
                   <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex items-center gap-3">
-                      {file.type === 'satellite' && <Satellite className="h-5 w-5 text-blue-600" />}
-                      {file.type === 'boundary' && <Map className="h-5 w-5 text-green-600" />}
-                      {file.type === 'dem' && <FileImage className="h-5 w-5 text-orange-600" />}
+                      <Map className="h-5 w-5 text-green-600" />
                       <div>
                         <p className="font-medium">{file.name}</p>
                         <p className="text-sm text-gray-500">

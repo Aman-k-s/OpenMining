@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card';
 import { Badge } from './components/ui/badge';
 import { Alert, AlertDescription } from './components/ui/alert';
 import { Mountain, Map, Upload, FileText, AlertTriangle, Activity } from 'lucide-react';
 import { Dashboard } from './components/Dashboard';
-import { DataUpload } from './components/DataUpload';
+import { BoundaryUpload } from './components/DataUpload'; // updated import
 import { InteractiveMap } from './components/InteractiveMap';
 import { Visualization3D } from './components/Visualization3D';
 import { ReportGenerator } from './components/ReportGenerator';
@@ -13,7 +13,7 @@ import { BoundaryManager } from './components/BoundaryManager';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [analysisData, setAnalysisData] = useState(null);
+  const [analysisData, setAnalysisData] = useState<any>(null);
   const [illegalMiningDetected, setIllegalMiningDetected] = useState(false);
 
   // Mock analysis results
@@ -27,7 +27,7 @@ function App() {
     riskLevel: 'High'
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Simulate initial data load
     setTimeout(() => {
       setAnalysisData(mockAnalysisResults);
@@ -47,34 +47,25 @@ function App() {
               <p className="text-sm text-gray-500">Automated Open Crust Mining Activity Detection</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            {illegalMiningDetected && (
-              <Alert className="w-auto border-red-200 bg-red-50">
-                <AlertTriangle className="h-4 w-4 text-red-600" />
-                <AlertDescription className="text-red-800">
-                  Illegal mining activity detected outside authorized boundaries
-                </AlertDescription>
-              </Alert>
-            )}
-            <Badge variant={analysisData?.riskLevel === 'High' ? 'destructive' : 'secondary'}>
-              Risk Level: {analysisData?.riskLevel || 'Unknown'}
-            </Badge>
-          </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="flex w-full space-x-2 overflow-x-auto">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <Activity className="h-4 w-4" />
               Dashboard
             </TabsTrigger>
-            <TabsTrigger value="upload" className="flex items-center gap-2">
+            <TabsTrigger value="boundaries" className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4" />
+              Boundaries
+            </TabsTrigger>
+            {/* <TabsTrigger value="upload" className="flex items-center gap-2">
               <Upload className="h-4 w-4" />
               Data Upload
-            </TabsTrigger>
+            </TabsTrigger> */}
             <TabsTrigger value="map" className="flex items-center gap-2">
               <Map className="h-4 w-4" />
               Interactive Map
@@ -82,10 +73,6 @@ function App() {
             <TabsTrigger value="3d" className="flex items-center gap-2">
               <Mountain className="h-4 w-4" />
               3D Visualization
-            </TabsTrigger>
-            <TabsTrigger value="boundaries" className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4" />
-              Boundaries
             </TabsTrigger>
             <TabsTrigger value="reports" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
@@ -97,9 +84,10 @@ function App() {
             <Dashboard analysisData={analysisData} />
           </TabsContent>
 
-          <TabsContent value="upload">
-            <DataUpload onDataUploaded={setAnalysisData} />
-          </TabsContent>
+          {/* <TabsContent value="upload">
+            {/* Replaced DataUpload with BoundaryUpload */}
+            {/* <BoundaryUpload onDataUploaded={setAnalysisData} />
+          </TabsContent> */}
 
           <TabsContent value="map">
             <InteractiveMap analysisData={analysisData} />

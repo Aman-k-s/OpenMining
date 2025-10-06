@@ -1,18 +1,24 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Progress } from './ui/progress';
-import { Badge } from './ui/badge';
-import { Alert, AlertDescription } from './ui/alert';
-import { 
-  Mountain, 
-  AlertTriangle, 
-  TrendingUp, 
-  MapPin, 
-  Layers, 
+import React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import { Progress } from "./ui/progress";
+import { Badge } from "./ui/badge";
+import { Alert, AlertDescription } from "./ui/alert";
+import {
+  Mountain,
+  AlertTriangle,
+  TrendingUp,
+  MapPin,
+  Layers,
   Calendar,
   Activity,
-  BarChart3
-} from 'lucide-react';
+  BarChart3,
+} from "lucide-react";
 // Removed recharts dependency to avoid build errors
 
 interface DashboardProps {
@@ -22,21 +28,29 @@ interface DashboardProps {
 export function Dashboard({ analysisData }: DashboardProps) {
   // Mock trend data
   const trendData = [
-    { month: 'Jan', authorized: 320, illegal: 45 },
-    { month: 'Feb', authorized: 340, illegal: 52 },
-    { month: 'Mar', authorized: 355, illegal: 48 },
-    { month: 'Apr', authorized: 370, illegal: 61 },
-    { month: 'May', authorized: 380, illegal: 69 },
-    { month: 'Jun', authorized: 380, illegal: 70 }
+    { month: "Jan", authorized: 100, illegal: 20, predicted: false },
+    { month: "Feb", authorized: 120, illegal: 25, predicted: false },
+    { month: "Mar", authorized: 150, illegal: 30, predicted: false },
+    { month: "Apr", authorized: 180, illegal: 35, predicted: false },
+    { month: "May", authorized: 200, illegal: 40, predicted: false },
+    { month: "Jun", authorized: 220, illegal: 45, predicted: false },
+    { month: "Jul", authorized: 240, illegal: 50, predicted: true },
+    { month: "Aug", authorized: 260, illegal: 55, predicted: true },
+    { month: "Sep", authorized: 280, illegal: 60, predicted: true },
+    { month: "Oct", authorized: 300, illegal: 65, predicted: true },
   ];
 
   const volumeData = [
-    { month: 'Jan', volume: 5200 },
-    { month: 'Feb', volume: 5800 },
-    { month: 'Mar', volume: 6100 },
-    { month: 'Apr', volume: 6400 },
-    { month: 'May', volume: 6700 },
-    { month: 'Jun', volume: 6890 }
+    { month: "Jan", volume: 5200, predicted: false },
+    { month: "Feb", volume: 5800, predicted: false },
+    { month: "Mar", volume: 6100, predicted: false },
+    { month: "Apr", volume: 6400, predicted: false },
+    { month: "May", volume: 6700, predicted: false },
+    { month: "Jun", volume: 6890, predicted: false },
+    { month: "Jul", volume: 7100, predicted: true },
+    { month: "Aug", volume: 7350, predicted: true },
+    { month: "Sep", volume: 7600, predicted: true },
+    { month: "Oct", volume: 7850, predicted: true },
   ];
 
   if (!analysisData) {
@@ -56,7 +70,10 @@ export function Dashboard({ analysisData }: DashboardProps) {
     );
   }
 
-  const complianceRate = ((analysisData.authorizedArea / analysisData.totalMiningArea) * 100).toFixed(1);
+  const complianceRate = (
+    (analysisData.authorizedArea / analysisData.totalMiningArea) *
+    100
+  ).toFixed(1);
 
   return (
     <div className="space-y-6">
@@ -65,7 +82,8 @@ export function Dashboard({ analysisData }: DashboardProps) {
         <Alert className="border-red-200 bg-red-50">
           <AlertTriangle className="h-4 w-4 text-red-600" />
           <AlertDescription className="text-red-800">
-            <strong>Critical:</strong> {analysisData.illegalArea} hectares of unauthorized mining detected outside permitted boundaries.
+            <strong>Critical:</strong> {analysisData.illegalArea} hectares of
+            illegal mining activity detected outside permitted boundaries.
           </AlertDescription>
         </Alert>
       )}
@@ -74,20 +92,27 @@ export function Dashboard({ analysisData }: DashboardProps) {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Mining Area</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Mining Area
+            </CardTitle>
             <Mountain className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analysisData.totalMiningArea} ha</div>
+            <div className="text-2xl font-bold">
+              {analysisData.totalMiningArea} ha
+            </div>
             <p className="text-xs text-muted-foreground">
-              {analysisData.illegalArea > 0 ? '+' : ''}{analysisData.illegalArea} ha from last analysis
+              {analysisData.illegalArea > 0 ? "+" : ""}
+              {analysisData.illegalArea} ha from last analysis
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Compliance Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Compliance Rate
+            </CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -98,24 +123,42 @@ export function Dashboard({ analysisData }: DashboardProps) {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Estimated Volume</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Estimated Volume
+            </CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{analysisData.estimatedVolume.toLocaleString()} m³</div>
-            <p className="text-xs text-muted-foreground">
-              Avg depth: {analysisData.estimatedDepth}m
-            </p>
+
+          <CardContent className="space-y-2">
+            <div className="text-2xl font-bold">
+              {analysisData.estimatedVolume.toLocaleString()} m³
+            </div>
+
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">
+                Avg depth: {analysisData.estimatedDepth} m
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Max depth: {(analysisData.estimatedDepth * 1.8).toFixed(1)} m
+              </p>
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Risk Assessment</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Environmental Risk Assessment
+            </CardTitle>
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <Badge variant={analysisData.riskLevel === 'High' ? 'destructive' : 'secondary'} className="text-sm">
+            <Badge
+              variant={
+                analysisData.riskLevel === "High" ? "destructive" : "secondary"
+              }
+              className="text-sm"
+            >
               {analysisData.riskLevel} Risk
             </Badge>
             <p className="text-xs text-muted-foreground mt-2">
@@ -128,67 +171,136 @@ export function Dashboard({ analysisData }: DashboardProps) {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
-          <CardHeader>
-            <CardTitle>Mining Activity Trends</CardTitle>
-            <CardDescription>Authorized vs Unauthorized mining over time</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-80 flex items-end justify-between gap-2 p-4 border rounded-lg bg-gray-50">
-              {trendData.map((data, index) => (
-                <div key={data.month} className="flex flex-col items-center gap-2 flex-1">
-                  <div className="relative w-full h-48 flex flex-col justify-end">
-                    <div 
-                      className="w-full bg-green-500 rounded-t-sm"
-                      style={{ height: `${(data.authorized / 400) * 100}%` }}
-                      title={`Authorized: ${data.authorized} ha`}
-                    ></div>
-                    <div 
-                      className="w-full bg-red-500 rounded-t-sm"
-                      style={{ height: `${(data.illegal / 80) * 100}%` }}
-                      title={`Unauthorized: ${data.illegal} ha`}
-                    ></div>
-                  </div>
-                  <span className="text-xs text-gray-600">{data.month}</span>
-                </div>
-              ))}
+  <CardHeader>
+    <CardTitle>Mining Activity Trends</CardTitle>
+    <CardDescription>
+      Authorized vs Unauthorized mining over time (including predictions)
+    </CardDescription>
+  </CardHeader>
+
+  <CardContent>
+    <div className="h-80 flex items-end justify-between gap-2 p-4 border rounded-lg bg-gray-50">
+      {trendData.map((data) => {
+        const totalMax = 500; // max total area to normalize heights
+        const authorizedHeight = (data.authorized / totalMax) * 100;
+        const illegalHeight = (data.illegal / totalMax) * 100;
+
+        return (
+          <div key={data.month} className="flex flex-col items-center gap-2 flex-1">
+            <div className="relative w-full h-48 flex flex-col justify-end">
+              {/* Unauthorized (bottom) */}
+              <div
+                className="w-full rounded-t-sm"
+                style={{
+                  height: `${illegalHeight}%`,
+                  background: data.predicted
+                    ? "repeating-linear-gradient(45deg, #f87171, #f87171 6px, #fecaca 6px, #fecaca 12px)" // red striped pattern
+                    : "#ef4444", // solid red for actual
+                }}
+                title={`Unauthorized: ${data.illegal} ha`}
+              ></div>
+              {/* Authorized (top) */}
+              <div
+                className="w-full rounded-t-sm"
+                style={{
+                  height: `${authorizedHeight}%`,
+                  background: data.predicted
+                    ? "repeating-linear-gradient(45deg, #34d399, #34d399 6px, #bbf7d0 6px, #bbf7d0 12px)" // green striped pattern
+                    : "#22c55e", // solid green for actual
+                }}
+                title={`Authorized: ${data.authorized} ha`}
+              ></div>
             </div>
-            <div className="flex justify-center gap-4 mt-4 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500 rounded"></div>
-                <span>Authorized</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-red-500 rounded"></div>
-                <span>Unauthorized</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            <span className="text-xs text-gray-600">{data.month}</span>
+          </div>
+        );
+      })}
+    </div>
+
+    {/* Legend */}
+    <div className="flex justify-center gap-4 mt-4 text-sm">
+      <div className="flex items-center gap-2">
+        <div className="w-3 h-3 bg-green-500 rounded"></div>
+        <span>Authorized</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="w-3 h-3 bg-red-500 rounded"></div>
+        <span>Unauthorized</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <div
+          className="w-3 h-3 rounded"
+          style={{
+            background:
+              "repeating-linear-gradient(45deg, #34d399, #34d399 6px, #bbf7d0 6px, #bbf7d0 12px)",
+          }}
+        ></div>
+        <span>Predicted Authorized</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <div
+          className="w-3 h-3 rounded"
+          style={{
+            background:
+              "repeating-linear-gradient(45deg, #f87171, #f87171 6px, #fecaca 6px, #fecaca 12px)",
+          }}
+        ></div>
+        <span>Predicted Unauthorized</span>
+      </div>
+    </div>
+  </CardContent>
+</Card>
+
 
         <Card>
           <CardHeader>
             <CardTitle>Volume Extraction</CardTitle>
-            <CardDescription>Estimated mining volume over time</CardDescription>
+            <CardDescription>
+              Estimated mining volume over time (Actual vs Predicted)
+            </CardDescription>
           </CardHeader>
+
           <CardContent>
             <div className="h-80 flex items-end justify-between gap-2 p-4 border rounded-lg bg-gray-50">
-              {volumeData.map((data, index) => (
-                <div key={data.month} className="flex flex-col items-center gap-2 flex-1">
+              {volumeData.map((data) => (
+                <div
+                  key={data.month}
+                  className="flex flex-col items-center gap-2 flex-1"
+                >
                   <div className="relative w-full h-48 flex items-end">
-                    <div 
-                      className="w-full bg-blue-500 rounded-t-sm"
-                      style={{ height: `${(data.volume / 7000) * 100}%` }}
-                      title={`Volume: ${data.volume.toLocaleString()} m³`}
-                    ></div>
+                    <div
+                      className="w-full rounded-t-sm"
+                      style={{
+                        height: `${(data.volume / 8000) * 100}%`,
+                        background: data.predicted
+                          ? "repeating-linear-gradient(45deg, #60a5fa, #60a5fa 6px, #bfdbfe 6px, #bfdbfe 12px)" // blue shades pattern
+                          : "#3b82f6", // solid Tailwind blue
+                      }}
+                      title={`${
+                        data.predicted ? "Predicted" : "Actual"
+                      } Volume: ${data.volume.toLocaleString()} m³`}
+                    />
                   </div>
                   <span className="text-xs text-gray-600">{data.month}</span>
                 </div>
               ))}
             </div>
-            <div className="flex justify-center gap-4 mt-4 text-sm">
+
+            {/* Legend */}
+            <div className="flex justify-center gap-6 mt-4 text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-blue-500 rounded"></div>
-                <span>Volume (m³)</span>
+                <span>Actual Volume</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 rounded"
+                  style={{
+                    background:
+                      "repeating-linear-gradient(45deg, #60a5fa, #60a5fa 6px, #bfdbfe 6px, #bfdbfe 12px)", // pattern for legend
+                  }}
+                ></div>
+                <span>Predicted Volume</span>
               </div>
             </div>
           </CardContent>
@@ -207,41 +319,49 @@ export function Dashboard({ analysisData }: DashboardProps) {
           <CardContent className="space-y-3">
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">Within Boundary:</span>
-              <span className="font-medium text-green-600">{analysisData.authorizedArea} ha</span>
+              <span className="font-medium text-green-600">
+                {analysisData.authorizedArea} ha
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">Outside Boundary:</span>
-              <span className="font-medium text-red-600">{analysisData.illegalArea} ha</span>
+              <span className="font-medium text-red-600">
+                {analysisData.illegalArea} ha
+              </span>
             </div>
             <div className="flex justify-between border-t pt-2">
               <span className="text-sm font-medium">Total Area:</span>
-              <span className="font-bold">{analysisData.totalMiningArea} ha</span>
+              <span className="font-bold">
+                {analysisData.totalMiningArea} ha
+              </span>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Layers className="h-4 w-4" />
-              Depth Analysis
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Average Depth:</span>
-              <span className="font-medium">{analysisData.estimatedDepth} m</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Max Depth:</span>
-              <span className="font-medium">{(analysisData.estimatedDepth * 1.8).toFixed(1)} m</span>
-            </div>
-            <div className="flex justify-between border-t pt-2">
-              <span className="text-sm font-medium">Est. Volume:</span>
-              <span className="font-bold">{analysisData.estimatedVolume.toLocaleString()} m³</span>
-            </div>
-          </CardContent>
-        </Card>
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      <Layers className="h-4 w-4" />
+      Carbon Impact & Credits
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="space-y-2">
+    <div className="flex justify-between">
+      <span className="text-sm text-gray-600">Estimated CO₂ Emissions:</span>
+      <span className="font-medium">12,450 kg</span>
+    </div>
+    <div className="flex justify-between">
+      <span className="text-sm text-gray-600">Suggested Carbon Credits:</span>
+      <span className="font-medium">1,245 credits</span>
+    </div>
+    <p className="text-xs text-gray-500 mt-2">
+      • Estimate CO₂ from deforestation/soil removal.<br />
+      • Suggest carbon credits needed to offset.<br />
+      • Adds policy + sustainability relevance.
+    </p>
+  </CardContent>
+</Card>
+
 
         <Card>
           <CardHeader>
@@ -253,7 +373,9 @@ export function Dashboard({ analysisData }: DashboardProps) {
           <CardContent className="space-y-3">
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">Date:</span>
-              <span className="font-medium">{analysisData.lastAnalysisDate}</span>
+              <span className="font-medium">
+                {analysisData.lastAnalysisDate}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">Data Source:</span>

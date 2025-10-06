@@ -675,132 +675,7 @@ export function Visualization3D({ analysisData }: Visualization3DProps) {
       <div className="grid gap-6 lg:grid-cols-4">
         {/* 3D Visualization */}
         <div className="lg:col-span-3">
-          <Card className="h-full">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Mountain className="h-5 w-5" />
-                  3D Mining Visualization
-                </CardTitle>
-                <div className="flex items-center gap-2">
-                  <Tabs value={viewMode} onValueChange={setViewMode}>
-                    <TabsList>
-                      <TabsTrigger value="terrain">Terrain</TabsTrigger>
-                      <TabsTrigger value="volume">Volume</TabsTrigger>
-                      <TabsTrigger value="analysis">Analysis</TabsTrigger>
-                    </TabsList>
-                  </Tabs>
-                </div>
-              </div>
-              <CardDescription>
-                Interactive 3D visualization of mining excavations with depth and volume analysis
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="relative">
-                <div
-                  ref={containerRef}
-                  className="w-full h-96 border rounded-lg bg-gradient-to-b from-sky-200 to-green-200 overflow-hidden"
-                  style={{ minHeight: '384px' }}
-                />
-                
-                {/* Loading Overlay */}
-                {loading && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
-                    <div className="text-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                      <p className="text-sm text-gray-600">Loading 3D visualization...</p>
-                    </div>
-                  </div>
-                )}
-                
-                {/* 3D Controls Overlay */}
-                <div className="absolute top-4 right-4 flex flex-col gap-2">
-                  <Button size="sm" variant="secondary" onClick={toggleAnimation}>
-                    {isAnimating ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                  </Button>
-                  <Button size="sm" variant="secondary" onClick={resetView}>
-                    <RotateCw className="h-4 w-4" />
-                  </Button>
-                  <Button size="sm" variant="secondary" onClick={zoomIn}>
-                    <ZoomIn className="h-4 w-4" />
-                  </Button>
-                  <Button size="sm" variant="secondary" onClick={zoomOut}>
-                    <ZoomOut className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="secondary"
-                    onClick={() => setViewMode(viewMode === 'terrain' ? 'volume' : 'terrain')}
-                  >
-                    <Move3D className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                {/* Status Indicators */}
-                <div className="absolute bottom-4 left-4 flex gap-2">
-                  <Badge variant="secondary">Authorized Zone</Badge>
-                  <Badge variant="destructive">Illegal Mining</Badge>
-                  <Badge variant="outline">3D Active</Badge>
-                </div>
-              </div>
-
-              {/* Control Panel */}
-              <div className="mt-6 grid gap-4 md:grid-cols-3">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Rotation Speed</label>
-                  <Slider
-                    value={rotationSpeed}
-                    onValueChange={setRotationSpeed}
-                    max={5}
-                    min={0.1}
-                    step={0.1}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-xs text-gray-500">
-                    <span>Slow</span>
-                    <span>Fast</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Elevation Scale</label>
-                  <Slider
-                    value={elevationScale}
-                    onValueChange={setElevationScale}
-                    max={5}
-                    min={0.5}
-                    step={0.1}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-xs text-gray-500">
-                    <span>1x</span>
-                    <span>5x</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">View Mode</label>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant={viewMode === 'terrain' ? 'default' : 'outline'}
-                      onClick={() => setViewMode('terrain')}
-                      className="flex-1"
-                    >
-                      Terrain
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant={viewMode === 'volume' ? 'default' : 'outline'}
-                      onClick={() => setViewMode('volume')}
-                      className="flex-1"
-                    >
-                      Volume
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          
         </div>
 
         {/* Analysis Panel */}
@@ -957,6 +832,7 @@ export function Visualization3D({ analysisData }: Visualization3DProps) {
 
       {/* Additional Analysis Cards */}
       <div className="grid gap-4 md:grid-cols-3">
+        {/* Depth Analysis */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Depth Analysis</CardTitle>
@@ -978,7 +854,8 @@ export function Visualization3D({ analysisData }: Visualization3DProps) {
             </div>
           </CardContent>
         </Card>
-
+        
+        {/* Surface Area */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Surface Area</CardTitle>
@@ -1000,7 +877,8 @@ export function Visualization3D({ analysisData }: Visualization3DProps) {
             </div>
           </CardContent>
         </Card>
-
+        
+        {/* Environmental Impact */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Environmental Impact</CardTitle>
