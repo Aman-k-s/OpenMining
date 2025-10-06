@@ -1,0 +1,22 @@
+{
+  "required_keys": [
+    "polygon_id",
+    "NDVI_pre",
+    "NDVI_post",
+    "NDBI_pre",
+    "NDBI_post",
+    "depth_m",
+    "volume_m3",
+    "area_m2"
+  ],
+  "notes": {
+    "polygon_id": "string identifier for mining patch",
+    "NDVI_pre": "float - vegetation index before mining",
+    "NDVI_post": "float - vegetation index after mining",
+    "NDBI_pre": "float - built-up index before mining",
+    "NDBI_post": "float - built-up index after mining",
+    "depth_m": "float - average or max depth from DEM",
+    "volume_m3": "float - estimated excavation volume (DEM based)",
+    "area_m2": "float - area of this polygon"
+  }
+}

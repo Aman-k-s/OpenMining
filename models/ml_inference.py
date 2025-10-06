@@ -1,0 +1,143 @@
+
+import json
+import math
+import joblib
+import numpy as np
+import pandas as pd
+from typing import Dict, Any, List, Optional
+
+DEFAULT_MODEL_PATH = "random_forest_mining.pkl"
+
+def _ensure_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Add missing expected columns with NA and cast numeric types safely."""
+    expected = ["NDVI_pre","NDVI_post","NDBI_pre","NDBI_post","depth_m","volume_m3","area_m2","polygon_id"]
+    for c in expected:
+        if c not in df.columns:
+            df[c] = np.nan
+    # Cast numeric columns to floats if possible (non-fatal)
+    for c in ["NDVI_pre","NDVI_post","NDBI_pre","NDBI_post","depth_m","volume_m3","area_m2"]:
+        df[c] = pd.to_numeric(df[c], errors="coerce")
+    return df
+
+def _feature_engineer(df: pd.DataFrame) -> pd.DataFrame:
+    """Create features used by the model. Keep same names used during training."""
+    df = _ensure_columns(df).copy()
+
+    # differences
+    df["dNDVI"] = df["NDVI_pre"] - df["NDVI_post"]
+    df["dNDBI"] = df["NDBI_post"] - df["NDBI_pre"]
+
+    # area transformation
+    df["area_log"] = np.log1p(df["area_m2"].fillna(0.0))
+
+    # normalized fields (avoid divide-by-zero)
+    depth_max = df["depth_m"].replace(0, np.nan).max()
+    vol_max = df["volume_m3"].replace(0, np.nan).max()
+    df["depth_norm"] = df["depth_m"] / (depth_max if not np.isnan(depth_max) and depth_max>0 else 1.0)
+    df["volume_norm"] = df["volume_m3"] / (vol_max if not np.isnan(vol_max) and vol_max>0 else 1.0)
+
+    # Fill NaNs for model input
+    df[["dNDVI","dNDBI","depth_norm","volume_norm","area_log"]] = df[["dNDVI","dNDBI","depth_norm","volume_norm","area_log"]].fillna(0.0)
+    return df
+
+# -------------------------
+# Main inference function
+# -------------------------
+def predict_mining_activity(input_json: Dict[str,Any], model_path: str = DEFAULT_MODEL_PATH) -> List[Dict[str,Any]]:
+    """
+    Main entrypoint for backend integration.
+
+    Args:
+      input_json: dict with key "features" containing list of polygon dicts
+      model_path: path to joblib-saved RandomForest model
+
+    Returns:
+      list of dicts (one per polygon) with keys:
+        polygon_id, prediction ("Illegal"|"Legal"), confidence (0-100),
+        dNDVI, dNDBI, depth_m, volume_m3, area_m2  (echoed/derived fields)
+    """
+    # validate input
+    if not isinstance(input_json, dict) or "features" not in input_json:
+        raise ValueError("input_json must be a dict with key 'features' (list).")
+
+    features = input_json["features"]
+    if not isinstance(features, list):
+        raise ValueError("'features' must be a list of polygon dicts.")
+
+    # convert to DataFrame
+    df = pd.json_normalize(features)
+    df = _feature_engineer(df)
+
+    # ensure model exists and load
+    try:
+        model = joblib.load(model_path)
+    except Exception as e:
+        raise RuntimeError(f"Could not load model at {model_path}: {e}")
+
+    # features used by model (must match training)
+    model_features = ["dNDVI","dNDBI","depth_norm","volume_norm","area_log"]
+    X = df[model_features].values
+
+    # predict. For safety, if model has predict_proba use that, else fallback to deterministic scoring.
+    try:
+        probs = model.predict_proba(X)
+        if probs.shape[1] == 2:
+            prob_illegal = probs[:, 0]  # probability of class 0 (illegal) as per our training
+        else:
+            # multi-class fallback: consider class named 0 if available
+            prob_illegal = np.zeros(len(X))
+    except Exception:
+        # fallback: use predict and set confidence to 80 for predicted illegal, 60 for legal (non-ideal)
+        preds = model.predict(X)
+        prob_illegal = np.array([0.8 if p==0 else 0.2 for p in preds])
+
+    preds_label = model.predict(X)
+
+    out = []
+    for i, row in df.reset_index(drop=True).iterrows():
+        p = {
+            "polygon_id": row.get("polygon_id", f"poly_{i}"),
+            "NDVI_pre": float(row.get("NDVI_pre") if not np.isnan(row.get("NDVI_pre")) else -999),
+            "NDVI_post": float(row.get("NDVI_post") if not np.isnan(row.get("NDVI_post")) else -999),
+            "NDBI_pre": float(row.get("NDBI_pre") if not np.isnan(row.get("NDBI_pre")) else -999),
+            "NDBI_post": float(row.get("NDBI_post") if not np.isnan(row.get("NDBI_post")) else -999),
+            "dNDVI": float(row["dNDVI"]),
+            "dNDBI": float(row["dNDBI"]),
+            "depth_m": float(row.get("depth_m") if not np.isnan(row.get("depth_m")) else 0.0),
+            "volume_m3": float(row.get("volume_m3") if not np.isnan(row.get("volume_m3")) else 0.0),
+            "area_m2": float(row.get("area_m2") if not np.isnan(row.get("area_m2")) else 0.0),
+            # model outputs:
+            "prediction": "Illegal" if int(preds_label[i]) == 0 else "Legal",
+            "confidence": float(round(prob_illegal[i] * 100, 2))
+        }
+        out.append(p)
+
+    return out
+
+# -------------------------
+# Convenience: small CLI test
+# -------------------------
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Run ML inference from JSON input file.")
+    parser.add_argument("--input", help="Path to input JSON file (features list).", required=False)
+    parser.add_argument("--model", help="Path to model .pkl (joblib).", default=DEFAULT_MODEL_PATH)
+    parser.add_argument("--output", help="Path to output JSON (predictions).", default="ml_predictions.json")
+    args = parser.parse_args()
+
+    if args.input:
+        with open(args.input) as f:
+            input_json = json.load(f)
+    else:
+        # small demo: synth 3 examples
+        input_json = {
+            "features": [
+                {"polygon_id":"demo_1","NDVI_pre":0.78,"NDVI_post":0.42,"NDBI_pre":0.21,"NDBI_post":0.47,"depth_m":18.0,"volume_m3":6000,"area_m2":1200},
+                {"polygon_id":"demo_2","NDVI_pre":0.65,"NDVI_post":0.60,"NDBI_pre":0.30,"NDBI_post":0.32,"depth_m":5.0,"volume_m3":950,"area_m2":800},
+                {"polygon_id":"demo_3","NDVI_pre":0.40,"NDVI_post":0.10,"NDBI_pre":0.18,"NDBI_post":0.45,"depth_m":22.0,"volume_m3":15000,"area_m2":3200}
+            ]
+        }
+    preds = predict_mining_activity(input_json, model_path=args.model)
+    with open(args.output, "w") as f:
+        json.dump(preds, f, indent=2)
+    print("Predictions written to", args.output)
