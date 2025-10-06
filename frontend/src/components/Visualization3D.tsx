@@ -18,6 +18,7 @@ import {
   Settings
 } from 'lucide-react';
 import * as THREE from 'three';
+import DEMRaster from './DEMRaster';
 
 // Simple OrbitControls implementation
 class OrbitControls {
@@ -675,7 +676,7 @@ export function Visualization3D({ analysisData }: Visualization3DProps) {
       <div className="grid gap-6 lg:grid-cols-4">
         {/* 3D Visualization */}
         <div className="lg:col-span-3">
-          
+           <DEMRaster width={800} height={500} />
         </div>
 
         {/* Analysis Panel */}
