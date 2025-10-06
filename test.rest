@@ -44,3 +44,7 @@ Authorization: Token 58fdcce847515137d46251c95f7330474217cda9
 ### DEM Raster
 GET http://127.0.0.1:8000/region/dem-raster/3
 Authorization: Token 58fdcce847515137d46251c95f7330474217cda9
+
+### Predict Mining Activity
+GET http://127.0.0.1:8000/region/activity/3
+Authorization: Token 58fdcce847515137d46251c95f7330474217cda9

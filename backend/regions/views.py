@@ -8,6 +8,7 @@ from .serializers import RegionSerializer
 from .utils import extract_geometries, fetch_region_report, fetch_dem_raster
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
+from models.ml_inference import predict_mining_activity
 
 class RegionReportView(APIView):
     def get(self, request, *args, **kwargs):
@@ -21,7 +22,6 @@ class RegionReportView(APIView):
 
         report = fetch_region_report(region, start_pre=start_pre, end_pre=end_pre, start_post=start_post, end_post=end_post)
         return Response({
-            'region':region.name,
             'report':report
         })
 
@@ -72,3 +72,20 @@ class DEMRaster(APIView):
 
         raster = fetch_dem_raster(region.polygon)
         return Response({"dem_raster":raster})
+    
+class Activity(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        region_id = self.kwargs.get('pk')
+        region = get_object_or_404(Region, pk=region_id)
+
+        start_pre = '2024-01-01'
+        end_pre   = '2024-06-30'
+        start_post = '2024-07-01'
+        end_post   = '2024-12-31'
+
+        report = fetch_region_report(region, start_pre=start_pre, end_pre=end_pre, start_post=start_post, end_post=end_post)
+        result = predict_mining_activity(input_json=report)
+
+        return Response(result)
