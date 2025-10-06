@@ -1,0 +1,46 @@
+### LOGIN 
+POST http://127.0.0.1:8000/login 
+Content-Type: application/json
+
+{"username": "admin", "password":"admin"}
+
+### SIGNUP
+POST http://127.0.0.1:8000/signup 
+Content-Type: application/json
+
+{"username":"Rakshit", "password":"test", "email":"rakshit3raj@gmail.com"}
+
+### TEST TOKEN
+GET http://127.0.0.1:8000/test_token 
+Content-Type: application/json 
+Authorization: Token 58fdcce847515137d46251c95f7330474217cda9
+
+{}
+
+### Upload KML file
+POST http://127.0.0.1:8000/region/upload
+Authorization: Token 58fdcce847515137d46251c95f7330474217cda9
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="name"
+
+Test Region
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="sample.kml"
+Content-Type: application/vnd.google-earth.kml+xml
+
+< ./sample.kml
+--WebAppBoundary--
+
+### List Regions
+GET http://127.0.0.1:8000/region/list
+Authorization: Token 58fdcce847515137d46251c95f7330474217cda9
+
+### Region Report
+GET http://127.0.0.1:8000/region/report/3
+Authorization: Token 58fdcce847515137d46251c95f7330474217cda9
+
+### DEM Raster
+GET http://127.0.0.1:8000/region/dem-raster/3
+Authorization: Token 58fdcce847515137d46251c95f7330474217cda9
