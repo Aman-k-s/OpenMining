@@ -43,8 +43,8 @@ function App() {
           <div className="flex items-center gap-3">
             <Mountain className="h-8 w-8 text-blue-600" />
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">Mining Detection System</h1>
-              <p className="text-sm text-gray-500">Automated Open Crust Mining Activity Detection</p>
+              <h1 className="text-xl font-semibold text-gray-900">TerraGuard</h1>
+              <p className="text-sm text-gray-500">Mining Impact & Compliance Monitor</p>
             </div>
           </div>
         </div>

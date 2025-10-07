@@ -5,6 +5,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "./ui/card";
 import { Progress } from "./ui/progress";
 import { Badge } from "./ui/badge";
@@ -18,6 +19,7 @@ import {
   Calendar,
   Activity,
   BarChart3,
+  Leaf,
 } from "lucide-react";
 // Removed recharts dependency to avoid build errors
 
@@ -171,86 +173,89 @@ export function Dashboard({ analysisData }: DashboardProps) {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
-  <CardHeader>
-    <CardTitle>Mining Activity Trends</CardTitle>
-    <CardDescription>
-      Authorized vs Unauthorized mining over time (including predictions)
-    </CardDescription>
-  </CardHeader>
+          <CardHeader>
+            <CardTitle>Mining Activity Trends</CardTitle>
+            <CardDescription>
+              Authorized vs Unauthorized mining over time (including
+              predictions)
+            </CardDescription>
+          </CardHeader>
 
-  <CardContent>
-    <div className="h-80 flex items-end justify-between gap-2 p-4 border rounded-lg bg-gray-50">
-      {trendData.map((data) => {
-        const totalMax = 500; // max total area to normalize heights
-        const authorizedHeight = (data.authorized / totalMax) * 100;
-        const illegalHeight = (data.illegal / totalMax) * 100;
+          <CardContent>
+            <div className="h-80 flex items-end justify-between gap-2 p-4 border rounded-lg bg-gray-50">
+              {trendData.map((data) => {
+                const totalMax = 500; // max total area to normalize heights
+                const authorizedHeight = (data.authorized / totalMax) * 100;
+                const illegalHeight = (data.illegal / totalMax) * 100;
 
-        return (
-          <div key={data.month} className="flex flex-col items-center gap-2 flex-1">
-            <div className="relative w-full h-48 flex flex-col justify-end">
-              {/* Unauthorized (bottom) */}
-              <div
-                className="w-full rounded-t-sm"
-                style={{
-                  height: `${illegalHeight}%`,
-                  background: data.predicted
-                    ? "repeating-linear-gradient(45deg, #f87171, #f87171 6px, #fecaca 6px, #fecaca 12px)" // red striped pattern
-                    : "#ef4444", // solid red for actual
-                }}
-                title={`Unauthorized: ${data.illegal} ha`}
-              ></div>
-              {/* Authorized (top) */}
-              <div
-                className="w-full rounded-t-sm"
-                style={{
-                  height: `${authorizedHeight}%`,
-                  background: data.predicted
-                    ? "repeating-linear-gradient(45deg, #34d399, #34d399 6px, #bbf7d0 6px, #bbf7d0 12px)" // green striped pattern
-                    : "#22c55e", // solid green for actual
-                }}
-                title={`Authorized: ${data.authorized} ha`}
-              ></div>
+                return (
+                  <div
+                    key={data.month}
+                    className="flex flex-col items-center gap-2 flex-1"
+                  >
+                    <div className="relative w-full h-48 flex flex-col justify-end">
+                      {/* Unauthorized (bottom) */}
+                      <div
+                        className="w-full rounded-t-sm"
+                        style={{
+                          height: `${illegalHeight}%`,
+                          background: data.predicted
+                            ? "repeating-linear-gradient(45deg, #f87171, #f87171 6px, #fecaca 6px, #fecaca 12px)" // red striped pattern
+                            : "#ef4444", // solid red for actual
+                        }}
+                        title={`Unauthorized: ${data.illegal} ha`}
+                      ></div>
+                      {/* Authorized (top) */}
+                      <div
+                        className="w-full rounded-t-sm"
+                        style={{
+                          height: `${authorizedHeight}%`,
+                          background: data.predicted
+                            ? "repeating-linear-gradient(45deg, #34d399, #34d399 6px, #bbf7d0 6px, #bbf7d0 12px)" // green striped pattern
+                            : "#22c55e", // solid green for actual
+                        }}
+                        title={`Authorized: ${data.authorized} ha`}
+                      ></div>
+                    </div>
+                    <span className="text-xs text-gray-600">{data.month}</span>
+                  </div>
+                );
+              })}
             </div>
-            <span className="text-xs text-gray-600">{data.month}</span>
-          </div>
-        );
-      })}
-    </div>
 
-    {/* Legend */}
-    <div className="flex justify-center gap-4 mt-4 text-sm">
-      <div className="flex items-center gap-2">
-        <div className="w-3 h-3 bg-green-500 rounded"></div>
-        <span>Authorized</span>
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="w-3 h-3 bg-red-500 rounded"></div>
-        <span>Unauthorized</span>
-      </div>
-      <div className="flex items-center gap-2">
-        <div
-          className="w-3 h-3 rounded"
-          style={{
-            background:
-              "repeating-linear-gradient(45deg, #34d399, #34d399 6px, #bbf7d0 6px, #bbf7d0 12px)",
-          }}
-        ></div>
-        <span>Predicted Authorized</span>
-      </div>
-      <div className="flex items-center gap-2">
-        <div
-          className="w-3 h-3 rounded"
-          style={{
-            background:
-              "repeating-linear-gradient(45deg, #f87171, #f87171 6px, #fecaca 6px, #fecaca 12px)",
-          }}
-        ></div>
-        <span>Predicted Unauthorized</span>
-      </div>
-    </div>
-  </CardContent>
-</Card>
-
+            {/* Legend */}
+            <div className="flex justify-center gap-4 mt-4 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-green-500 rounded"></div>
+                <span>Authorized</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-red-500 rounded"></div>
+                <span>Unauthorized</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 rounded"
+                  style={{
+                    background:
+                      "repeating-linear-gradient(45deg, #34d399, #34d399 6px, #bbf7d0 6px, #bbf7d0 12px)",
+                  }}
+                ></div>
+                <span>Predicted Authorized</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 rounded"
+                  style={{
+                    background:
+                      "repeating-linear-gradient(45deg, #f87171, #f87171 6px, #fecaca 6px, #fecaca 12px)",
+                  }}
+                ></div>
+                <span>Predicted Unauthorized</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
@@ -339,29 +344,42 @@ export function Dashboard({ analysisData }: DashboardProps) {
         </Card>
 
         <Card>
-  <CardHeader>
-    <CardTitle className="flex items-center gap-2">
-      <Layers className="h-4 w-4" />
-      Carbon Impact & Credits
-    </CardTitle>
-  </CardHeader>
-  <CardContent className="space-y-2">
-    <div className="flex justify-between">
-      <span className="text-sm text-gray-600">Estimated CO₂ Emissions:</span>
-      <span className="font-medium">12,450 kg</span>
-    </div>
-    <div className="flex justify-between">
-      <span className="text-sm text-gray-600">Suggested Carbon Credits:</span>
-      <span className="font-medium">1,245 credits</span>
-    </div>
-    <p className="text-xs text-gray-500 mt-2">
-      • Estimate CO₂ from deforestation/soil removal.<br />
-      • Suggest carbon credits needed to offset.<br />
-      • Adds policy + sustainability relevance.
-    </p>
-  </CardContent>
-</Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Layers className="h-4 w-4" />
+              Carbon Offset Required
+            </CardTitle>
+          </CardHeader>
 
+          <CardContent className="space-y-3">
+            {/* Main Value */}
+            <div className="text-2xl font-bold">
+              12,300 CO₂e <span className="text-sm text-gray-500">±2,000</span>
+            </div>
+
+            {/* Plain-language equivalence */}
+            <p className="text-sm text-gray-600">
+              Equivalent to yearly emissions of{" "}
+              <span className="font-medium">3,000 cars</span>
+            </p>
+
+            {/* Period */}
+            <p className="text-xs text-gray-500">Period: Q2 FY25</p>
+          </CardContent>
+
+          {/* Compact footer */}
+          <div className="flex items-center justify-between border-t px-4 py-2 text-sm">
+            <div className="flex gap-4">
+              <button className="text-blue-600 hover:underline">
+                Plan offsets
+              </button>
+              <button className="text-blue-600 hover:underline">
+                View method
+              </button>
+            </div>
+            <span className="text-xs text-gray-400">Indicative estimate</span>
+          </div>
+        </Card>
 
         <Card>
           <CardHeader>
@@ -388,6 +406,35 @@ export function Dashboard({ analysisData }: DashboardProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Plain-language summary */}
+{/* Insights & Observations */}
+<Card className="col-span-full bg-gradient-to-r from-gray-50 to-white shadow-sm">
+  <CardHeader>
+    <CardTitle className="text-base font-semibold text-gray-800">
+      Key Observations
+    </CardTitle>
+    <CardDescription className="text-sm text-gray-500">
+      Narrative summary of detected activity
+    </CardDescription>
+  </CardHeader>
+  <CardContent>
+    <p className="text-sm text-gray-700 leading-relaxed">
+      Between <span className="font-medium">Apr–Jun 2024</span>, activity expanded by 
+      <span className="font-medium"> 2.3 km²</span>; about 
+      <span className="font-medium"> 0.4 km²</span> lies outside the lease boundary. 
+      Excavation volume is estimated at 
+      <span className="font-medium"> 1.8 million m³</span>, with depths reaching up to 
+      <span className="font-medium"> 65 m</span>. 
+      The environmental impact is equivalent to ~ 
+      <span className="font-medium">carbon credits</span>, comparable to the yearly emissions of  
+      <span className="font-medium"> 3,000 cars </span>. 
+      Immediate attention is advised for out-of-boundary zones (marked in red) and remediation planning near high-depth areas close to water features.
+    </p>
+  </CardContent>
+</Card>
+
+
     </div>
   );
 }
