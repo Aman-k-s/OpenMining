@@ -1,0 +1,728 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+  <Document>
+    <name>Boundary of Mining Lease.kml</name>
+    <Schema name="AS Per GPS ML" id="S_AS_Per_GPS_ML_ID">
+      <SimpleField type="int" name="Id">
+        <displayName>&lt;b&gt;Id&lt;/b&gt;</displayName>
+      </SimpleField>
+      <SimpleField type="double" name="Area">
+        <displayName>&lt;b&gt;Area&lt;/b&gt;</displayName>
+      </SimpleField>
+    </Schema>
+    <Schema name="Components Wise Land Use" id="S_Components_Wise_Land_Use_SD">
+      <SimpleField type="string" name="Name">
+        <displayName>&lt;b&gt;Name&lt;/b&gt;</displayName>
+      </SimpleField>
+      <SimpleField type="double" name="Area">
+        <displayName>&lt;b&gt;Area&lt;/b&gt;</displayName>
+      </SimpleField>
+    </Schema>
+    <Style id="falseColor">
+      <IconStyle>
+        <color>ffe7ebef</color>
+      </IconStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Name</b></td><td>$[Components Wise Land Use/Name]</td></tr>
+  <tr><td><b>Area</b></td><td>$[Components Wise Land Use/Area]</td></tr>
+</table>
+]]></text>
+      </BalloonStyle>
+      <ListStyle>
+      </ListStyle>
+      <LineStyle>
+        <color>ffe7ebef</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>800055ff</color>
+      </PolyStyle>
+      <gx:IconStackStyle>
+      </gx:IconStackStyle>
+    </Style>
+    <Style id="falseColor1">
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Id</b></td><td>$[AS Per GPS ML/Id]</td></tr>
+  <tr><td><b>Area</b></td><td>$[AS Per GPS ML/Area]</td></tr>
+</table>]]></text>
+      </BalloonStyle>
+      <LineStyle>
+        <color>ff0000ff</color>
+        <width>2</width>
+      </LineStyle>
+      <PolyStyle>
+        <fill>0</fill>
+      </PolyStyle>
+    </Style>
+    <Style id="falseColor0">
+      <IconStyle>
+        <color>ffe7ebef</color>
+      </IconStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Name</b></td><td>$[Components Wise Land Use/Name]</td></tr>
+  <tr><td><b>Area</b></td><td>$[Components Wise Land Use/Area]</td></tr>
+</table>
+]]></text>
+      </BalloonStyle>
+      <ListStyle>
+      </ListStyle>
+      <LineStyle>
+        <color>ffe7ebef</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>807f0055</color>
+      </PolyStyle>
+      <gx:IconStackStyle>
+      </gx:IconStackStyle>
+    </Style>
+    <Style id="falseColor2">
+      <IconStyle>
+        <color>ffe7ebef</color>
+      </IconStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Name</b></td><td>$[Components Wise Land Use/Name]</td></tr>
+  <tr><td><b>Area</b></td><td>$[Components Wise Land Use/Area]</td></tr>
+</table>
+]]></text>
+      </BalloonStyle>
+      <ListStyle>
+      </ListStyle>
+      <LineStyle>
+        <color>ffe7ebef</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>80ffaaff</color>
+      </PolyStyle>
+      <gx:IconStackStyle>
+      </gx:IconStackStyle>
+    </Style>
+    <StyleMap id="falseColor3">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#falseColor8</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#falseColor</styleUrl>
+      </Pair>
+    </StyleMap>
+    <StyleMap id="msn_ylw-pushpin">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#sn_ylw-pushpin</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#sh_ylw-pushpin</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="style12">
+      <LineStyle>
+        <color>fffefe00</color>
+      </LineStyle>
+    </Style>
+    <Style id="style19">
+      <LineStyle>
+        <color>fffefe00</color>
+      </LineStyle>
+    </Style>
+    <Style id="sh_ylw-pushpin">
+      <IconStyle>
+        <scale>1.3</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+        </Icon>
+        <hotSpot x="20" y="2" xunits="pixels" yunits="pixels" />
+      </IconStyle>
+      <BalloonStyle>
+      </BalloonStyle>
+      <LineStyle>
+        <color>ff00ff00</color>
+        <width>3</width>
+      </LineStyle>
+    </Style>
+    <Style id="falseColor00">
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Id</b></td><td>$[AS Per GPS ML/Id]</td></tr>
+  <tr><td><b>Area</b></td><td>$[AS Per GPS ML/Area]</td></tr>
+</table>]]></text>
+      </BalloonStyle>
+      <LineStyle>
+        <color>ff0000ff</color>
+        <width>2</width>
+      </LineStyle>
+      <PolyStyle>
+        <fill>0</fill>
+      </PolyStyle>
+    </Style>
+    <Style id="sn_ylw-pushpin">
+      <IconStyle>
+        <scale>1.1</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>
+        </Icon>
+        <hotSpot x="20" y="2" xunits="pixels" yunits="pixels" />
+      </IconStyle>
+      <BalloonStyle>
+      </BalloonStyle>
+      <LineStyle>
+        <color>ff00ff00</color>
+        <width>3</width>
+      </LineStyle>
+    </Style>
+    <StyleMap id="falseColor4">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#falseColor18</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#falseColor13</styleUrl>
+      </Pair>
+    </StyleMap>
+    <StyleMap id="stylemap_id15">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#style12</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#style10</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="falseColor5">
+      <IconStyle>
+        <color>ffe7ebef</color>
+      </IconStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Name</b></td><td>$[Components Wise Land Use/Name]</td></tr>
+  <tr><td><b>Area</b></td><td>$[Components Wise Land Use/Area]</td></tr>
+</table>
+]]></text>
+      </BalloonStyle>
+      <ListStyle>
+      </ListStyle>
+      <LineStyle>
+        <color>ffe7ebef</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>80ffff00</color>
+      </PolyStyle>
+      <gx:IconStackStyle>
+      </gx:IconStackStyle>
+    </Style>
+    <Style id="falseColor6">
+      <IconStyle>
+        <color>ffe7ebef</color>
+      </IconStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Name</b></td><td>$[Components Wise Land Use/Name]</td></tr>
+  <tr><td><b>Area</b></td><td>$[Components Wise Land Use/Area]</td></tr>
+</table>
+]]></text>
+      </BalloonStyle>
+      <ListStyle>
+      </ListStyle>
+      <LineStyle>
+        <color>ffe7ebef</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>800055aa</color>
+      </PolyStyle>
+      <gx:IconStackStyle>
+      </gx:IconStackStyle>
+    </Style>
+    <Style id="falseColor7">
+      <IconStyle>
+        <color>ffe7ebef</color>
+      </IconStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Name</b></td><td>$[Components Wise Land Use/Name]</td></tr>
+  <tr><td><b>Area</b></td><td>$[Components Wise Land Use/Area]</td></tr>
+</table>
+]]></text>
+      </BalloonStyle>
+      <ListStyle>
+      </ListStyle>
+      <LineStyle>
+        <color>ffe7ebef</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>80ffff00</color>
+      </PolyStyle>
+      <gx:IconStackStyle>
+      </gx:IconStackStyle>
+    </Style>
+    <Style id="falseColor8">
+      <IconStyle>
+        <color>ffe7ebef</color>
+      </IconStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Name</b></td><td>$[Components Wise Land Use/Name]</td></tr>
+  <tr><td><b>Area</b></td><td>$[Components Wise Land Use/Area]</td></tr>
+</table>
+]]></text>
+      </BalloonStyle>
+      <ListStyle>
+      </ListStyle>
+      <LineStyle>
+        <color>ffe7ebef</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>800055ff</color>
+      </PolyStyle>
+      <gx:IconStackStyle>
+      </gx:IconStackStyle>
+    </Style>
+    <StyleMap id="falseColor9">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#falseColor15</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#falseColor0</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="style10">
+      <LineStyle>
+        <color>fffefe00</color>
+      </LineStyle>
+    </Style>
+    <Style id="falseColor10">
+      <IconStyle>
+        <color>ffe7ebef</color>
+      </IconStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Name</b></td><td>$[Components Wise Land Use/Name]</td></tr>
+  <tr><td><b>Area</b></td><td>$[Components Wise Land Use/Area]</td></tr>
+</table>
+]]></text>
+      </BalloonStyle>
+      <ListStyle>
+      </ListStyle>
+      <LineStyle>
+        <color>ffe7ebef</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>800055aa</color>
+      </PolyStyle>
+      <gx:IconStackStyle>
+      </gx:IconStackStyle>
+    </Style>
+    <StyleMap id="falseColor11">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#falseColor1</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#falseColor00</styleUrl>
+      </Pair>
+    </StyleMap>
+    <StyleMap id="falseColor12">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#falseColor16</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#falseColor2</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="falseColor13">
+      <IconStyle>
+        <color>ffe7ebef</color>
+      </IconStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Name</b></td><td>$[Components Wise Land Use/Name]</td></tr>
+  <tr><td><b>Area</b></td><td>$[Components Wise Land Use/Area]</td></tr>
+</table>
+]]></text>
+      </BalloonStyle>
+      <ListStyle>
+      </ListStyle>
+      <LineStyle>
+        <color>ffe7ebef</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>80ff00aa</color>
+      </PolyStyle>
+      <gx:IconStackStyle>
+      </gx:IconStackStyle>
+    </Style>
+    <StyleMap id="falseColor14">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#falseColor7</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#falseColor5</styleUrl>
+      </Pair>
+    </StyleMap>
+    <StyleMap id="stylemap_id13">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#style19</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#style0</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="falseColor15">
+      <IconStyle>
+        <color>ffe7ebef</color>
+      </IconStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Name</b></td><td>$[Components Wise Land Use/Name]</td></tr>
+  <tr><td><b>Area</b></td><td>$[Components Wise Land Use/Area]</td></tr>
+</table>
+]]></text>
+      </BalloonStyle>
+      <ListStyle>
+      </ListStyle>
+      <LineStyle>
+        <color>ffe7ebef</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>807f0055</color>
+      </PolyStyle>
+      <gx:IconStackStyle>
+      </gx:IconStackStyle>
+    </Style>
+    <Style id="style0">
+      <LineStyle>
+        <color>fffefe00</color>
+      </LineStyle>
+    </Style>
+    <Style id="falseColor16">
+      <IconStyle>
+        <color>ffe7ebef</color>
+      </IconStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Name</b></td><td>$[Components Wise Land Use/Name]</td></tr>
+  <tr><td><b>Area</b></td><td>$[Components Wise Land Use/Area]</td></tr>
+</table>
+]]></text>
+      </BalloonStyle>
+      <ListStyle>
+      </ListStyle>
+      <LineStyle>
+        <color>ffe7ebef</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>80ffaaff</color>
+      </PolyStyle>
+      <gx:IconStackStyle>
+      </gx:IconStackStyle>
+    </Style>
+    <StyleMap id="falseColor17">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#falseColor10</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#falseColor6</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Style id="falseColor18">
+      <IconStyle>
+        <color>ffe7ebef</color>
+      </IconStyle>
+      <BalloonStyle>
+        <text><![CDATA[<table border="0">
+  <tr><td><b>Name</b></td><td>$[Components Wise Land Use/Name]</td></tr>
+  <tr><td><b>Area</b></td><td>$[Components Wise Land Use/Area]</td></tr>
+</table>
+]]></text>
+      </BalloonStyle>
+      <ListStyle>
+      </ListStyle>
+      <LineStyle>
+        <color>ffe7ebef</color>
+      </LineStyle>
+      <PolyStyle>
+        <color>80ff00aa</color>
+      </PolyStyle>
+      <gx:IconStackStyle>
+      </gx:IconStackStyle>
+    </Style>
+    <Folder>
+      <name>Boundary of Mining Lease</name>
+      <open>1</open>
+      <Style>
+        <ListStyle>
+          <listItemType>check</listItemType>
+          <ItemIcon>
+            <state>open</state>
+            <href>:/mysavedplaces_open.png</href>
+          </ItemIcon>
+          <ItemIcon>
+            <state>closed</state>
+            <href>:/mysavedplaces_closed.png</href>
+          </ItemIcon>
+          <bgColor>00ffffff</bgColor>
+          <maxSnippetLines>2</maxSnippetLines>
+        </ListStyle>
+      </Style>
+      <Placemark>
+        <name>MEL Mining Lease for Diversion</name>
+        <styleUrl>#falseColor11</styleUrl>
+        <ExtendedData>
+          <SchemaData schemaUrl="#S_AS_Per_GPS_ML_ID">
+            <SimpleData name="Id">0</SimpleData>
+            <SimpleData name="Area">37.4549</SimpleData>
+          </SchemaData>
+        </ExtendedData>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>
+							76.67582460000015,13.42290890000002,0 76.67459790000014,13.42613510000001,0 76.66529890000017,13.4238974,0 76.66744640000019,13.42086690000001,0 76.67582460000015,13.42290890000002,0 
+						</coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+        <id>FP/KA/MIN/154749/2022</id>
+        <id1>611312351217N1409BoundaryofMiningLease.kml</id1>
+        <id2>Pno_Inserted</id2>
+      </Placemark>
+      <Placemark id="FP/KA/MIN/154749/2022">
+        <name>Gollarahalli Sy.No.12</name>
+        <styleUrl>#stylemap_id13</styleUrl>
+        <id5>Sucess</id5>
+        <LineString>
+          <coordinates>
+						76.6659855269294,13.4140128934263,0 76.6785115875376,13.4158762229598,0 
+					</coordinates>
+        </LineString>
+        <LineString>
+          <coordinates>
+						76.6785115875366,13.4158762229588,0 76.67470588522821,13.4258406543971,0 
+					</coordinates>
+        </LineString>
+        <LineString>
+          <coordinates>
+						76.6747058852272,13.4258406543961,0 76.6625944465233,13.4213859441751,0 
+					</coordinates>
+        </LineString>
+        <LineString>
+          <coordinates>
+						76.66259444652231,13.4213859441741,0 76.66579835523009,13.4164786419663,0 
+					</coordinates>
+        </LineString>
+        <LineString>
+          <coordinates>
+						76.6657983552291,13.4164786419653,0 76.6659855269324,13.4140128934279,0 
+					</coordinates>
+        </LineString>
+        <id1>61121233122255E55MiningLeaseandComponentLandUse.kml</id1>
+        <id2>Pno_Inserted</id2>
+        <id>FP/KA/MIN/154749/2022</id>
+        <id1>611312351217N1409BoundaryofMiningLease.kml</id1>
+        <id2>Pno_Inserted</id2>
+      </Placemark>
+      <Placemark id="FP/KA/MIN/154749/2022">
+        <name>Gollarahalli Sy.No.11</name>
+        <styleUrl>#stylemap_id15</styleUrl>
+        <id5>Sucess</id5>
+        <LineString>
+          <coordinates>
+						76.66259444652231,13.4213859441741,0 76.66042457106469,13.426491567116,0 
+					</coordinates>
+        </LineString>
+        <LineString>
+          <coordinates>
+						76.6604245710637,13.426491567115,0 76.6605961694856,13.4273483530204,0 
+					</coordinates>
+        </LineString>
+        <LineString>
+          <coordinates>
+						76.66059616948461,13.4273483530194,0 76.6728176424152,13.4309382263832,0 
+					</coordinates>
+        </LineString>
+        <LineString>
+          <coordinates>
+						76.6728176424142,13.4309382263822,0 76.67470588522821,13.4258406543971,0 
+					</coordinates>
+        </LineString>
+        <LineString>
+          <coordinates>
+						76.6747058852272,13.4258406543961,0 76.6625944465233,13.4213859441751,0 
+					</coordinates>
+        </LineString>
+        <id1>61121233122255E55MiningLeaseandComponentLandUse.kml</id1>
+        <id2>Pno_Inserted</id2>
+        <id>FP/KA/MIN/154749/2022</id>
+        <id1>611312351217N1409BoundaryofMiningLease.kml</id1>
+        <id2>Pno_Inserted</id2>
+      </Placemark>
+      <Folder id="layer 0">
+        <name>Components Wise Land Use</name>
+        <open>1</open>
+        <Placemark>
+          <name>Area For Infrastructure 0.50Ha</name>
+          <styleUrl>#falseColor14</styleUrl>
+          <ExtendedData>
+            <SchemaData schemaUrl="#S_Components_Wise_Land_Use_SD">
+              <SimpleData name="Name">Area For Infrastructure 0.50Ha</SimpleData>
+              <SimpleData name="Area">0.500293</SimpleData>
+            </SchemaData>
+          </ExtendedData>
+          <Polygon>
+            <outerBoundaryIs>
+              <LinearRing>
+                <coordinates>
+								76.66580109999995,13.42330769999997,0 76.66644699999999,13.42351060000001,0 76.66609219999997,13.42401850000003,0 76.66541319999999,13.42385510000002,0 76.66580109999995,13.42330769999997,0 
+							</coordinates>
+              </LinearRing>
+            </outerBoundaryIs>
+          </Polygon>
+          <id>FP/KA/MIN/154749/2022</id>
+          <id1>611312351217N1409BoundaryofMiningLease.kml</id1>
+          <id2>Pno_Inserted</id2>
+        </Placemark>
+        <Placemark>
+          <name>Area for Mineral Stack 2.50Ha</name>
+          <styleUrl>#falseColor12</styleUrl>
+          <ExtendedData>
+            <SchemaData schemaUrl="#S_Components_Wise_Land_Use_SD">
+              <SimpleData name="Name">Area for Mineral Stack 2.49Ha</SimpleData>
+              <SimpleData name="Area">2.49531</SimpleData>
+            </SchemaData>
+          </ExtendedData>
+          <Polygon>
+            <outerBoundaryIs>
+              <LinearRing>
+                <coordinates>
+								76.66644699999999,13.42351060000001,0 76.66580109999995,13.42330769999997,0 76.6663573,13.4225227,0 76.66782940000002,13.42314779999997,0 76.6673133,13.4243124,0 76.66609219999997,13.42401850000003,0 76.66644699999999,13.42351060000001,0 
+							</coordinates>
+              </LinearRing>
+            </outerBoundaryIs>
+          </Polygon>
+          <id>FP/KA/MIN/154749/2022</id>
+          <id1>611312351217N1409BoundaryofMiningLease.kml</id1>
+          <id2>Pno_Inserted</id2>
+        </Placemark>
+        <Placemark>
+          <name>Area For Crushing &amp; Screening 2.00Ha</name>
+          <styleUrl>#falseColor17</styleUrl>
+          <ExtendedData>
+            <SchemaData schemaUrl="#S_Components_Wise_Land_Use_SD">
+              <SimpleData name="Name">Area For Crushing &amp; Screening 2.00Ha</SimpleData>
+              <SimpleData name="Area">2.00204</SimpleData>
+            </SchemaData>
+          </ExtendedData>
+          <Polygon>
+            <outerBoundaryIs>
+              <LinearRing>
+                <coordinates>
+								76.6673133,13.4243124,0 76.66782940000002,13.42314779999997,0 76.66909459999999,13.42368180000003,0 76.66881719999998,13.42467420000004,0 76.6673133,13.4243124,0 
+							</coordinates>
+              </LinearRing>
+            </outerBoundaryIs>
+          </Polygon>
+          <id>FP/KA/MIN/154749/2022</id>
+          <id1>611312351217N1409BoundaryofMiningLease.kml</id1>
+          <id2>Pno_Inserted</id2>
+        </Placemark>
+        <Placemark>
+          <name>Area for Over Burden 7.70Ha</name>
+          <styleUrl>#falseColor9</styleUrl>
+          <ExtendedData>
+            <SchemaData schemaUrl="#S_Components_Wise_Land_Use_SD">
+              <SimpleData name="Name">Area for Over Burden 7.67Ha</SimpleData>
+              <SimpleData name="Area">7.67327</SimpleData>
+            </SchemaData>
+          </ExtendedData>
+          <Polygon>
+            <outerBoundaryIs>
+              <LinearRing>
+                <coordinates>
+								76.66909459999999,13.42368180000003,0 76.66782940000002,13.42314779999997,0 76.6663573,13.4225227,0 76.6674761,13.42094389999999,0 76.67011900000001,13.42158820000002,0 76.66948769999998,13.42384680000001,0 76.66909459999999,13.42368180000003,0 
+							</coordinates>
+              </LinearRing>
+            </outerBoundaryIs>
+          </Polygon>
+          <id>FP/KA/MIN/154749/2022</id>
+          <id1>611312351217N1409BoundaryofMiningLease.kml</id1>
+          <id2>Pno_Inserted</id2>
+        </Placemark>
+        <Placemark>
+          <name>Area for Top Soil Storage 0.51Ha</name>
+          <styleUrl>#falseColor4</styleUrl>
+          <ExtendedData>
+            <SchemaData schemaUrl="#S_Components_Wise_Land_Use_SD">
+              <SimpleData name="Name">Area for Top Soil Storage 0.50Ha</SimpleData>
+              <SimpleData name="Area">0.504903</SimpleData>
+            </SchemaData>
+          </ExtendedData>
+          <Polygon>
+            <outerBoundaryIs>
+              <LinearRing>
+                <coordinates>
+								76.66909459999999,13.42368180000003,0 76.66948769999998,13.42384680000001,0 76.66922869999998,13.42477330000001,0 76.66881719999998,13.42467420000004,0 76.66909459999999,13.42368180000003,0 
+							</coordinates>
+              </LinearRing>
+            </outerBoundaryIs>
+          </Polygon>
+          <id>FP/KA/MIN/154749/2022</id>
+          <id1>611312351217N1409BoundaryofMiningLease.kml</id1>
+          <id2>Pno_Inserted</id2>
+        </Placemark>
+        <Placemark>
+          <name>Area for Mining 22.30 Ha</name>
+          <styleUrl>#falseColor3</styleUrl>
+          <ExtendedData>
+            <SchemaData schemaUrl="#S_Components_Wise_Land_Use_SD">
+              <SimpleData name="Name">Area for Mining 22.23 Ha</SimpleData>
+              <SimpleData name="Area">22.2314</SimpleData>
+            </SchemaData>
+          </ExtendedData>
+          <Polygon>
+            <outerBoundaryIs>
+              <LinearRing>
+                <coordinates>
+								76.66948769999998,13.42384680000001,0 76.67011900000001,13.42158820000002,0 76.67573260000002,13.42295630000003,0 76.67455440000002,13.4260548,0 76.66922869999998,13.42477330000001,0 76.66948769999998,13.42384680000001,0 
+							</coordinates>
+              </LinearRing>
+            </outerBoundaryIs>
+          </Polygon>
+          <id>FP/KA/MIN/154749/2022</id>
+          <id1>611312351217N1409BoundaryofMiningLease.kml</id1>
+          <id2>Pno_Inserted</id2>
+        </Placemark>
+        <Placemark id="FP/KA/MIN/154749/2022">
+          <name>7.5m Safety Zone 2.05 Ha</name>
+          <styleUrl>#msn_ylw-pushpin</styleUrl>
+          <LineString>
+            <tessellate>1</tessellate>
+            <coordinates>
+						76.67454438485352,13.42604879371171,0 76.67573018335524,13.42295336647169,0 76.66746842895368,13.4209340834343,0 76.66541350407677,13.42384812030918,0 76.67454438485352,13.42604879371171,0 
+					</coordinates>
+          </LineString>
+          <id1>61121233122255E55MiningLeaseandComponentLandUse.kml</id1>
+          <id2>Pno_Inserted</id2>
+          <id>FP/KA/MIN/154749/2022</id>
+          <id1>611312351217N1409BoundaryofMiningLease.kml</id1>
+          <id2>Pno_Inserted</id2>
+        </Placemark>
+      </Folder>
+    </Folder>
+  </Document>
+</kml>

@@ -95,16 +95,6 @@ def predict_mining_activity(input_json: Dict[str,Any], model_path: str = DEFAULT
     out = []
     for i, row in df.reset_index(drop=True).iterrows():
         p = {
-            "polygon_id": row.get("polygon_id", f"poly_{i}"),
-            "NDVI_pre": float(row.get("NDVI_pre") if not np.isnan(row.get("NDVI_pre")) else -999),
-            "NDVI_post": float(row.get("NDVI_post") if not np.isnan(row.get("NDVI_post")) else -999),
-            "NDBI_pre": float(row.get("NDBI_pre") if not np.isnan(row.get("NDBI_pre")) else -999),
-            "NDBI_post": float(row.get("NDBI_post") if not np.isnan(row.get("NDBI_post")) else -999),
-            "dNDVI": float(row["dNDVI"]),
-            "dNDBI": float(row["dNDBI"]),
-            "depth_m": float(row.get("depth_m") if not np.isnan(row.get("depth_m")) else 0.0),
-            "volume_m3": float(row.get("volume_m3") if not np.isnan(row.get("volume_m3")) else 0.0),
-            "area_m2": float(row.get("area_m2") if not np.isnan(row.get("area_m2")) else 0.0),
             "prediction": "Illegal" if int(preds_label[i]) == 0 else "Legal",
             "confidence": float(round(prob_illegal[i] * 100, 2))
         }

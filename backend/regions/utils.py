@@ -2,46 +2,67 @@ import math
 import ee
 
 def fetch_ee_data(polygon_coords, start_pre, end_pre, start_post, end_post):
-    """Fetch NDVI, NDBI (Landsat 8 C02), mean DEM, area, and volume."""
+    """Fetch NDVI (MODIS), NDBI (Landsat 8 C02), mean DEM, area, and rough volume estimate."""
     poly = ee.Geometry.Polygon(polygon_coords)
 
-    def mean_index(coll, band):
-        return coll.select(band).mean().reduceRegion(
-            ee.Reducer.mean(),
+    # --- Helper to compute mean of an image collection band ---
+    def mean_index(coll, band, scale_factor=1.0):
+        result = coll.select(band).mean().multiply(scale_factor).reduceRegion(
+            reducer=ee.Reducer.mean(),
             geometry=poly,
             scale=30
-        ).getInfo().get(band, None)
+        ).getInfo()
+        return result.get(band, None)
 
-    # NDVI (MODIS)
-    ndvi_pre = mean_index(ee.ImageCollection('MODIS/061/MOD13Q1').filterDate(start_pre, end_pre), 'NDVI')
-    ndvi_post = mean_index(ee.ImageCollection('MODIS/061/MOD13Q1').filterDate(start_post, end_post), 'NDVI')
+    # --- NDVI (MODIS, scaled by 0.0001) ---
+    ndvi_pre = mean_index(
+        ee.ImageCollection('MODIS/061/MOD13Q1').filterDate(start_pre, end_pre),
+        'NDVI',
+        0.0001
+    )
+    ndvi_post = mean_index(
+        ee.ImageCollection('MODIS/061/MOD13Q1').filterDate(start_post, end_post),
+        'NDVI',
+        0.0001
+    )
 
-    # NDBI (Landsat 8 C02)
-    def ndbi(img):
+    # --- Landsat 8 Surface Reflectance cloud masking ---
+    def mask_l8_sr(img):
         qa = img.select('QA_PIXEL')
-        mask = qa.eq(0)
-        return img.updateMask(mask).normalizedDifference(['SR_B6', 'SR_B5']).rename('ndbi')
+        # Bits 3 and 4: Cloud and Cloud Shadow
+        cloud_mask = qa.bitwiseAnd(1 << 3).eq(0).And(qa.bitwiseAnd(1 << 4).eq(0))
+        return img.updateMask(cloud_mask)
+
+    # --- NDBI (Landsat 8 C02) ---
+    def ndbi(img):
+        img = mask_l8_sr(img)
+        return img.normalizedDifference(['SR_B6', 'SR_B5']).rename('ndbi')
 
     ndbi_pre = mean_index(
-        ee.ImageCollection('LANDSAT/LC08/C02/T1_L2').filterDate(start_pre, end_pre).map(ndbi),
-        'ndbi'
-    )
-    ndbi_post = mean_index(
-        ee.ImageCollection('LANDSAT/LC08/C02/T1_L2').filterDate(start_post, end_post).map(ndbi),
+        ee.ImageCollection('LANDSAT/LC08/C02/T1_L2')
+        .filterDate(start_pre, end_pre)
+        .map(ndbi),
         'ndbi'
     )
 
-    # Mean DEM
+    ndbi_post = mean_index(
+        ee.ImageCollection('LANDSAT/LC08/C02/T1_L2')
+        .filterDate(start_post, end_post)
+        .map(ndbi),
+        'ndbi'
+    )
+
+    # --- Mean DEM (SRTM) ---
     dem_mean = ee.Image('USGS/SRTMGL1_003').reduceRegion(
-        ee.Reducer.mean(),
+        reducer=ee.Reducer.mean(),
         geometry=poly,
         scale=30
     ).getInfo().get('elevation', None)
 
-    # Area km²
+    # --- Area (km²) ---
     area_km2 = calculate_area(polygon_coords)
 
-    # Approximate volume in m³
+    # --- Approximate "volume" (m³) ---
     volume_m3 = dem_mean * area_km2 * 1e6 if dem_mean is not None else None
 
     return {
@@ -53,6 +74,7 @@ def fetch_ee_data(polygon_coords, start_pre, end_pre, start_post, end_post):
         'area_km2': area_km2,
         'volume_m3': volume_m3
     }
+
 
 def fetch_region_report(region, start_pre, end_pre, start_post, end_post):
     """Fetch EE data for all polygons in a region."""

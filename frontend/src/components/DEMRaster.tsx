@@ -38,65 +38,83 @@ const DEMRaster = () => {
     const height = mountRef.current.clientHeight;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xadd8e6); // mining-sky blue
+    scene.background = new THREE.Color(0xadd8e6);
 
     const camera = new THREE.PerspectiveCamera(60, width / height, 1, 5000);
-
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
     mountRef.current.appendChild(renderer.domElement);
 
-    // OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.enablePan = true;
     controls.autoRotate = autoRotate;
 
     // Lighting
-    // Ambient light ensures nothing is completely dark
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2); 
-    scene.add(ambientLight);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.25));
 
-    // Soft directional light for subtle shading
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-    directionalLight.position.set(1, 2, 1);
-    directionalLight.castShadow = false; // no harsh shadows
-    scene.add(directionalLight);
+    const sun = new THREE.DirectionalLight(0xffffff, 0.8);
+    sun.position.set(1, 2, 1);
+    scene.add(sun);
 
-    // Optional: a second light from the opposite side for balance
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
-    fillLight.position.set(-1, -1, -1);
-    scene.add(fillLight);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.3);
+    fill.position.set(-1, -1, -1);
+    scene.add(fill);
 
-    // Geometry
     const rows = depthData.length;
     const cols = depthData[0].length;
     const geometry = new THREE.PlaneGeometry(cols, rows, cols - 1, rows - 1);
 
-    for (let i = 0; i < geometry.attributes.position.count; i++) {
-      const ix = i % cols;
-      const iy = Math.floor(i / cols);
-      geometry.attributes.position.setZ(i, depthData[iy][ix]);
-    }
-
-    geometry.computeVertexNormals();
-
-    // Colors based on elevation
-    const colors = [];
-    let min = Infinity,
-      max = -Infinity;
-    depthData.forEach((row) =>
-      row.forEach((z) => {
-        min = Math.min(min, z);
-        max = Math.max(max, z);
+    // --- Calculate elevation stats ---
+    let minZ = Infinity,
+      maxZ = -Infinity;
+    depthData.forEach((r) =>
+      r.forEach((z) => {
+        if (z < minZ) minZ = z;
+        if (z > maxZ) maxZ = z;
       })
     );
 
-    for (let i = 0; i < geometry.attributes.position.count; i++) {
-      const z = geometry.attributes.position.getZ(i);
-      const t = (z - min) / (max - min);
-      const color = new THREE.Color();
-      color.setHSL((1 - t) * 0.0 + t * 0.33, 1, 0.5); // green top -> red bottom
+    const heightRange = maxZ - minZ;
+    const horizontalScale = Math.max(rows, cols);
+    const heightScale = horizontalScale / 5; // smaller = steeper, larger = flatter
+
+    const pos = geometry.attributes.position as THREE.BufferAttribute;
+
+    // --- Set vertex heights ---
+    for (let i = 0; i < pos.count; i++) {
+      const ix = i % cols;
+      const iy = Math.floor(i / cols);
+      const z = depthData[iy][ix];
+      const scaledZ = ((z - minZ) / heightRange) * heightScale;
+      pos.setZ(i, scaledZ);
+    }
+    pos.needsUpdate = true;
+
+    geometry.computeVertexNormals();
+
+    // --- Apply color map based on true elevation ---
+    const colors: number[] = [];
+    const color = new THREE.Color();
+
+    for (let i = 0; i < pos.count; i++) {
+      const ix = i % cols;
+      const iy = Math.floor(i / cols);
+      const z = depthData[iy][ix];
+      const t = (z - minZ) / heightRange;
+
+      // Custom mining color gradient (low→high = dark red → brown → green)
+      if (t < 0.3) {
+        // Deep mining zones — dark red to reddish-brown
+        color.setRGB(0.25 + t * 0.2, 0.05 + t * 0.1, 0.05 + t * 0.05);
+      } else if (t < 0.6) {
+        // Mid elevations — earthy brown
+        color.setRGB(0.6 + (t - 0.3) * 0.3, 0.35 + (t - 0.3) * 0.15, 0.2);
+      } else {
+        // High elevations — green
+        color.setRGB(0.2 - (t - 0.6) * 0.1, 0.6 + (t - 0.6) * 0.4, 0.2);
+      }
+
       colors.push(color.r, color.g, color.b);
     }
 
@@ -104,6 +122,7 @@ const DEMRaster = () => {
 
     const material = new THREE.MeshStandardMaterial({
       vertexColors: true,
+      flatShading: false,
       side: THREE.DoubleSide,
       wireframe: showGrid,
     });
@@ -112,28 +131,21 @@ const DEMRaster = () => {
     mesh.rotation.x = -Math.PI / 2;
     scene.add(mesh);
 
-    // Grid helper
-    const gridHelper = new THREE.GridHelper(Math.max(cols, rows), Math.max(cols, rows), 0xffffff, 0x555555);
-    gridHelper.visible = showGrid;
-    scene.add(gridHelper);
-
-    // Fit camera to mesh
+    // --- Camera fitting ---
     const bbox = new THREE.Box3().setFromObject(mesh);
     const size = bbox.getSize(new THREE.Vector3());
     const center = bbox.getCenter(new THREE.Vector3());
 
     const maxDim = Math.max(size.x, size.y, size.z);
     const fov = camera.fov * (Math.PI / 180);
-    let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+    const cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
 
-    camera.position.set(center.x, cameraZ * 0.8 + center.y, center.z + cameraZ);
+    camera.position.set(center.x, cameraZ * 0.7 + center.y, center.z + cameraZ);
     camera.lookAt(center);
-
     controls.target.copy(center);
 
     setLoading(false);
 
-    // Resize handler
     const handleResize = () => {
       const w = mountRef.current!.clientWidth;
       const h = mountRef.current!.clientHeight;
@@ -152,28 +164,22 @@ const DEMRaster = () => {
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      if (mountRef.current && renderer && renderer.domElement && mountRef.current.contains(renderer.domElement)) {
-        try {
-          mountRef.current.removeChild(renderer.domElement);
-        } catch (err) {
-          console.warn('Failed to remove renderer DOM element:', err);
-        }
-      }
-      try {
-        geometry.dispose();
-      } catch (err) {
-        /* ignore */
-      }
-      try {
-        material.dispose();
-      } catch (err) {
-        /* ignore */
-      }
+      if (
+        mountRef.current &&
+        renderer.domElement &&
+        mountRef.current.contains(renderer.domElement)
+      )
+        mountRef.current.removeChild(renderer.domElement);
+      geometry.dispose();
+      material.dispose();
     };
   }, [depthData, showGrid, autoRotate]);
 
   return (
-    <div style={{ width: "100%", height: "600px", position: "relative" }} ref={mountRef}>
+    <div
+      style={{ width: "100%", height: "600px", position: "relative" }}
+      ref={mountRef}
+    >
       {loading && (
         <div
           style={{
@@ -191,9 +197,22 @@ const DEMRaster = () => {
           Loading 3D map...
         </div>
       )}
-      <div style={{ position: "absolute", top: 10, left: 10, display: "flex", gap: "0.5rem", zIndex: 20 }}>
-        <Button onClick={() => setShowGrid(!showGrid)}>{showGrid ? "Hide Grid" : "Show Grid"}</Button>
-        <Button onClick={() => setAutoRotate(!autoRotate)}>{autoRotate ? "Stop Rotate" : "Auto Rotate"}</Button>
+      <div
+        style={{
+          position: "absolute",
+          top: 10,
+          left: 10,
+          display: "flex",
+          gap: "0.5rem",
+          zIndex: 20,
+        }}
+      >
+        <Button onClick={() => setShowGrid(!showGrid)}>
+          {showGrid ? "Hide Grid" : "Show Grid"}
+        </Button>
+        <Button onClick={() => setAutoRotate(!autoRotate)}>
+          {autoRotate ? "Stop Rotate" : "Auto Rotate"}
+        </Button>
       </div>
     </div>
   );

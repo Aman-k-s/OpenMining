@@ -608,17 +608,9 @@ export function Visualization3D({ analysisData }: Visualization3DProps) {
       if (controlsRef.current) {
         controlsRef.current.dispose();
       }
-      if (rendererRef.current && containerRef.current && containerRef.current.contains(rendererRef.current.domElement)) {
-        try {
-          containerRef.current.removeChild(rendererRef.current.domElement);
-        } catch (err) {
-          console.warn('Failed to remove 3D renderer DOM element:', err);
-        }
-        try {
-          rendererRef.current.dispose();
-        } catch (err) {
-          /* ignore */
-        }
+      if (rendererRef.current && containerRef.current) {
+        containerRef.current.removeChild(rendererRef.current.domElement);
+        rendererRef.current.dispose();
       }
     };
   }, [initializeScene, animate]);
@@ -684,7 +676,7 @@ export function Visualization3D({ analysisData }: Visualization3DProps) {
       <div className="grid gap-6 lg:grid-cols-4">
         {/* 3D Visualization */}
         <div className="lg:col-span-3">
-           <DEMRaster width={800} height={500} />
+           <DEMRaster/>
         </div>
 
         {/* Analysis Panel */}
