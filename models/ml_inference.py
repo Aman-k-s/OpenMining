@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from typing import Dict, Any, List, Optional
 
-DEFAULT_MODEL_PATH = "random_forest_mining.pkl"
+DEFAULT_MODEL_PATH = "../models/random_forest_mining.pkl"
 
 def _ensure_columns(df: pd.DataFrame) -> pd.DataFrame:
     """Add missing expected columns with NA and cast numeric types safely."""
