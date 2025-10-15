@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+{/* @ts-ignore */}
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Button } from "./ui/button";
 
