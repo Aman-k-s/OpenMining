@@ -46,21 +46,24 @@ def _feature_engineer(df: pd.DataFrame) -> pd.DataFrame:
 def predict_mining_activity(input_json: Dict[str,Any], model_path: str = DEFAULT_MODEL_PATH) -> List[Dict[str,Any]]:
     """
     Main entrypoint for backend integration.
-
-    Args:
-      input_json: dict with key "features" containing list of polygon dicts
-      model_path: path to joblib-saved RandomForest model
-
-    Returns:
-      list of dicts (one per polygon) with keys:
-        polygon_id, prediction ("Illegal"|"Legal"), confidence (0-100),
-        dNDVI, dNDBI, depth_m, volume_m3, area_m2  (echoed/derived fields)
     """
-    # validate input
-    if not isinstance(input_json, dict) or "features" not in input_json:
-        raise ValueError("input_json must be a dict with key 'features' (list).")
 
-    features = input_json["features"]
+    # 🩹 Fix: Robust input validation with auto-wrapping
+    if input_json is None:
+        raise ValueError("input_json cannot be None.")
+
+    # if frontend accidentally sends list instead of dict
+    if isinstance(input_json, list):
+        input_json = {"features": input_json}
+
+    # if 'features' missing but input looks like single polygon dict
+    if isinstance(input_json, dict) and "features" not in input_json:
+        if all(k in input_json for k in ["NDVI_pre", "NDVI_post", "NDBI_pre", "NDBI_post"]):
+            input_json = {"features": [input_json]}
+        else:
+            raise ValueError("input_json must be a dict with key 'features' (list).")
+
+    features = input_json.get("features", [])
     if not isinstance(features, list):
         raise ValueError("'features' must be a list of polygon dicts.")
 
@@ -74,20 +77,16 @@ def predict_mining_activity(input_json: Dict[str,Any], model_path: str = DEFAULT
     except Exception as e:
         raise RuntimeError(f"Could not load model at {model_path}: {e}")
 
-    # features used by model (must match training)
     model_features = ["dNDVI","dNDBI","depth_norm","volume_norm","area_log"]
     X = df[model_features].values
 
-    # predict. For safety, if model has predict_proba use that, else fallback to deterministic scoring.
     try:
         probs = model.predict_proba(X)
         if probs.shape[1] == 2:
-            prob_illegal = probs[:, 0]  # probability of class 0 (illegal) as per our training
+            prob_illegal = probs[:, 0]
         else:
-            # multi-class fallback: consider class named 0 if available
             prob_illegal = np.zeros(len(X))
     except Exception:
-        # fallback: use predict and set confidence to 80 for predicted illegal, 60 for legal (non-ideal)
         preds = model.predict(X)
         prob_illegal = np.array([0.8 if p==0 else 0.2 for p in preds])
 
@@ -106,13 +105,13 @@ def predict_mining_activity(input_json: Dict[str,Any], model_path: str = DEFAULT
             "depth_m": float(row.get("depth_m") if not np.isnan(row.get("depth_m")) else 0.0),
             "volume_m3": float(row.get("volume_m3") if not np.isnan(row.get("volume_m3")) else 0.0),
             "area_m2": float(row.get("area_m2") if not np.isnan(row.get("area_m2")) else 0.0),
-            # model outputs:
             "prediction": "Illegal" if int(preds_label[i]) == 0 else "Legal",
             "confidence": float(round(prob_illegal[i] * 100, 2))
         }
         out.append(p)
 
     return out
+
 
 # -------------------------
 # Convenience: small CLI test
