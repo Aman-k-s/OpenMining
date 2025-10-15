@@ -23,6 +23,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
+import api from '../lib/api';
 
 interface InteractiveMapProps {
   analysisData?: any;
@@ -46,42 +47,12 @@ export function InteractiveMap({ analysisData }: InteractiveMapProps) {
   const [zoom, setZoom] = useState(12);
   const [mapLoading, setMapLoading] = useState(true);
   const [mapError, setMapError] = useState<string | null>(null);
+  const [regionsLoading, setRegionsLoading] = useState(false);
+  const [regionsError, setRegionsError] = useState<string | null>(null);
 
   
 
-  // Mock mining areas data
-  const miningAreas = [
-    {
-      id: 1,
-      name: "Mining Site Alpha",
-      type: "authorized",
-      coordinates: [23.2599, 77.4126],
-      area: 125.5,
-      depth: 8.2,
-      status: "Active",
-      lastUpdate: "2024-12-28",
-    },
-    {
-      id: 2,
-      name: "Mining Site Beta",
-      type: "illegal",
-      coordinates: [23.265, 77.42],
-      area: 45.3,
-      depth: 12.1,
-      status: "Violation",
-      lastUpdate: "2024-12-27",
-    },
-    {
-      id: 3,
-      name: "Mining Site Gamma",
-      type: "authorized",
-      coordinates: [23.25, 77.405],
-      area: 87.9,
-      depth: 6.5,
-      status: "Active",
-      lastUpdate: "2024-12-26",
-    },
-  ];
+  // No local placeholder areas: we will draw regions from API only
 
   // Initialize Leaflet map
   useEffect(() => {
@@ -149,92 +120,93 @@ export function InteractiveMap({ analysisData }: InteractiveMapProps) {
               polygons: [],
             };
 
-            // Add mining area markers
-            miningAreas.forEach((area) => {
-              const color = area.type === "illegal" ? "#ef4444" : "#22c55e";
-              const icon = L.divIcon({
-                html: `
-                <div style="
-                  background-color: ${color};
-                  width: 20px;
-                  height: 20px;
-                  border-radius: 50%;
-                  border: 3px solid white;
-                  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                ">
-                  <div style="
-                    background-color: white;
-                    width: 8px;
-                    height: 8px;
-                    border-radius: 50%;
-                  "></div>
-                </div>
-              `,
-                className: "custom-mining-marker",
-                iconSize: [20, 20],
-                iconAnchor: [10, 10],
-              });
+            // We'll fetch regions from backend and draw those polygons (no placeholders)
 
-              const marker = L.marker(
-                [area.coordinates[0], area.coordinates[1]],
-                { icon }
-              ).addTo(map).bindPopup(`
-    <div style="min-width: 200px;">
-      <h3 style="margin: 0 0 8px 0; font-weight: 600;">${area.name}</h3>
-      <div style="margin-bottom: 4px;">
-        <span style="
-          background-color: ${area.type === "illegal" ? "#fecaca" : "#bbf7d0"};
-          color: ${area.type === "illegal" ? "#dc2626" : "#166534"};
-          padding: 2px 6px;
-          border-radius: 4px;
-          font-size: 12px;
-          font-weight: 500;
-        ">${area.status}</span>
-      </div>
-      <div style="font-size: 14px; line-height: 1.4;">
-        <div><strong>Area:</strong> ${area.area} hectares</div>
-        <div><strong>Depth:</strong> ${area.depth} m</div>
-        <div><strong>Volume:</strong> ${(
-          area.area *
-          area.depth *
-          100
-        ).toLocaleString()} m³</div>
-        <div><strong>Last Updated:</strong> ${area.lastUpdate}</div>
-      </div>
-    </div>
-  `);
+            // Provide a loadRegions helper so we can reload on demand and clear old polygons
+            const loadRegions = async () => {
+              try {
+                setRegionsLoading(true);
+                setRegionsError(null);
 
-              // Store marker with area info for layer control
-              leafletMapRef.current.markers.push({ marker, area });
+                // remove existing polygons
+                if (leafletMapRef.current?.polygons) {
+                  leafletMapRef.current.polygons.forEach(({ polygon }: any) => {
+                    try {
+                      if (map.hasLayer(polygon)) map.removeLayer(polygon);
+                    } catch (err) {
+                      // ignore
+                    }
+                  });
+                  leafletMapRef.current.polygons = [];
+                }
 
-              marker.on("click", () => {
-                setSelectedFeature(area);
-              });
-            });
+                const regions: any[] = await api.listRegions();
+                const drawnPolys: any[] = [];
 
-            // Add boundary polygons for mining areas
-            miningAreas.forEach((area) => {
-              const bounds: [[number, number], [number, number]] = [
-                [area.coordinates[0] - 0.002, area.coordinates[1] - 0.002],
-                [area.coordinates[0] + 0.002, area.coordinates[1] + 0.002],
-              ];
+                regions.forEach((reg) => {
+                  const geoms = reg.polygon || [];
 
-              const polygon = L.rectangle(bounds, {
-                color: area.type === "illegal" ? "#ef4444" : "#22c55e",
-                weight: 2,
-                fillOpacity: 0.1,
-              });
+                  const looksLikeRing = Array.isArray(geoms) && geoms.length > 0 && typeof geoms[0][0] === 'number';
+                  const processGeoms = looksLikeRing ? [geoms] : geoms;
 
-              if (showLayers.boundaries) {
-                polygon.addTo(map);
+                  processGeoms.forEach((g: any) => {
+                    if (Array.isArray(g) && g.length && Array.isArray(g[0])) {
+                      if (g.length >= 3) {
+                        const latlngs = g.map((pt: any) => [pt[1], pt[0]]);
+                        const first = latlngs[0];
+                        const last = latlngs[latlngs.length - 1];
+                        if (first[0] !== last[0] || first[1] !== last[1]) latlngs.push(first);
+                        const poly = L.polygon(latlngs, { color: '#0f172a', weight: 2, fillOpacity: 0.12 });
+                        poly.bindPopup(`<strong>${reg.name}</strong><br/>Region ID: ${reg.id}`);
+                        poly.on('click', () => {
+                          setSelectedFeature(reg);
+                          map.fitBounds(poly.getBounds(), { padding: [20, 20] });
+                        });
+                        if (showLayers.boundaries) poly.addTo(map);
+                        leafletMapRef.current.polygons.push({ polygon: poly, area: reg });
+                        drawnPolys.push(poly);
+                      }
+                    } else if (g && g.type === 'Polygon' && Array.isArray(g.coordinates)) {
+                      const ring = g.coordinates[0] || [];
+                      if (ring.length >= 3) {
+                        const latlngs = ring.map((pt: any) => [pt[1], pt[0]]);
+                        const first = latlngs[0];
+                        const last = latlngs[latlngs.length - 1];
+                        if (first[0] !== last[0] || first[1] !== last[1]) latlngs.push(first);
+                        const poly = L.polygon(latlngs, { color: '#065f46', weight: 2, fillOpacity: 0.12 });
+                        poly.bindPopup(`<strong>${reg.name}</strong><br/>Region ID: ${reg.id}`);
+                        poly.on('click', () => {
+                          setSelectedFeature(reg);
+                          map.fitBounds(poly.getBounds(), { padding: [20, 20] });
+                        });
+                        if (showLayers.boundaries) poly.addTo(map);
+                        leafletMapRef.current.polygons.push({ polygon: poly, area: reg });
+                        drawnPolys.push(poly);
+                      }
+                    }
+                  });
+                });
+
+                // Fit map to all polygons if any drawn
+                if (drawnPolys.length > 0) {
+                  const group = L.featureGroup(drawnPolys);
+                  map.fitBounds(group.getBounds(), { padding: [20, 20] });
+                }
+
+                // store a helper for manual reload
+                leafletMapRef.current.loadRegions = loadRegions;
+                // set a small region count in state by setting selectedFeature to null to avoid re-render complexity
+                console.debug('Regions drawn:', drawnPolys.length);
+              } catch (e) {
+                console.warn('Failed to load regions', e);
+                setRegionsError(String(e));
+              } finally {
+                setRegionsLoading(false);
               }
+            };
 
-              // Store polygon with area info for layer control
-              leafletMapRef.current.polygons.push({ polygon, area });
-            });
+            // initial load
+            loadRegions();
 
             // Map event listeners
             map.on("move", () => {
@@ -399,6 +371,18 @@ export function InteractiveMap({ analysisData }: InteractiveMapProps) {
                         <Mountain className="h-4 w-4 mr-1" />
                         Terrain
                       </Button>
+                      <div className="flex items-center gap-2">
+                        <Button size="sm" variant="outline" onClick={() => {
+                          // allow manual reload of regions and show errors in UI
+                          try {
+                            const ref = leafletMapRef.current;
+                            if (ref && ref.loadRegions) ref.loadRegions();
+                          } catch (e) {
+                            console.warn('Manual reload failed', e);
+                          }
+                        }}>Reload Regions</Button>
+                        <div className="text-xs bg-white/90 px-2 py-1 rounded text-slate-900 border">Regions: {leafletMapRef.current?.polygons?.length ?? 0}</div>
+                      </div>
                       {/* <Button
                         size="sm"
                         variant={mapView === 'hybrid' ? 'default' : 'outline'}
@@ -490,6 +474,18 @@ export function InteractiveMap({ analysisData }: InteractiveMapProps) {
                         <span>1 km</span>
                       </div>
                     </div>
+                    {/* Regions loader/error */}
+                    {regionsLoading && (
+                      <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 rounded text-sm border" style={{ zIndex: 1000 }}>
+                        Loading regions...
+                      </div>
+                    )}
+
+                    {regionsError && (
+                      <div className="absolute top-4 left-4 bg-red-50 px-3 py-1 rounded text-sm border text-red-600" style={{ zIndex: 1000 }}>
+                        Regions: {regionsError}
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

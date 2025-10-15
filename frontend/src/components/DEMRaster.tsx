@@ -152,9 +152,23 @@ const DEMRaster = () => {
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      mountRef.current!.removeChild(renderer.domElement);
-      geometry.dispose();
-      material.dispose();
+      if (mountRef.current && renderer && renderer.domElement && mountRef.current.contains(renderer.domElement)) {
+        try {
+          mountRef.current.removeChild(renderer.domElement);
+        } catch (err) {
+          console.warn('Failed to remove renderer DOM element:', err);
+        }
+      }
+      try {
+        geometry.dispose();
+      } catch (err) {
+        /* ignore */
+      }
+      try {
+        material.dispose();
+      } catch (err) {
+        /* ignore */
+      }
     };
   }, [depthData, showGrid, autoRotate]);
 

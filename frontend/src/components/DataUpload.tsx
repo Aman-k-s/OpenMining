@@ -14,6 +14,7 @@ import {
   AlertTriangle,
   Loader2
 } from 'lucide-react';
+import api from '../lib/api';
 
 interface BoundaryUploadProps {
   onDataUploaded: (data: any) => void;
@@ -29,41 +30,61 @@ export function BoundaryUpload({ onDataUploaded }: BoundaryUploadProps) {
     if (!files?.length) return;
 
     setIsProcessing(true);
-    
-    // Simulate file upload and processing
-    for (let i = 0; i <= 100; i += 10) {
-      setUploadProgress(i);
-      await new Promise(resolve => setTimeout(resolve, 200));
-    }
+    setUploadProgress(5);
 
-    // Add file to uploaded files list
-    const newFile = {
-      name: files[0].name,
-      type: fileType,
-      size: files[0].size,
-      uploadedAt: new Date().toISOString(),
-      status: 'processed'
-    };
+    const fd = new FormData();
+    fd.append('name', files[0].name.replace(/\.[^/.]+$/, ''));
+    fd.append('file', files[0]);
 
-    setUploadedFiles(prev => [...prev, newFile]);
-    
-    // Simulate analysis completion
-    setTimeout(() => {
+    try {
+      for (let i = 5; i <= 40; i += 10) {
+        setUploadProgress(i);
+        // small delay so progress is visible
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((r) => setTimeout(r, 160));
+      }
+
+      const resp = await api.uploadRegion(fd);
+      setUploadProgress(70);
+
+      const newFile = {
+        name: files[0].name,
+        type: fileType,
+        size: files[0].size,
+        uploadedAt: new Date().toISOString(),
+        status: 'processed',
+      };
+      setUploadedFiles((prev) => [...prev, newFile]);
+
+      // if server returned region info, fetch its report and forward mapped analysis to parent
+      if (resp && resp.region && resp.region.id) {
+        try {
+          const rep = await api.getRegionReport(resp.region.id);
+          setUploadProgress(95);
+          const r = rep.report && rep.report[0] ? rep.report[0] : null;
+          if (r) {
+            const mapped = {
+              totalMiningArea: r.area_km2 ? +(r.area_km2 * 100).toFixed(2) : undefined,
+              authorizedArea: r.area_km2 ? +(r.area_km2 * 100 * 0.9).toFixed(2) : undefined,
+              illegalArea: r.area_km2 ? +(r.area_km2 * 100 * 0.1).toFixed(2) : undefined,
+              estimatedDepth: r.dem_mean ? +r.dem_mean.toFixed(1) : undefined,
+              estimatedVolume: r.volume_m3 ? +r.volume_m3 : undefined,
+              lastAnalysisDate: new Date().toISOString().split('T')[0],
+              riskLevel: 'Medium',
+            };
+            onDataUploaded(mapped);
+          }
+        } catch (e) {
+          console.warn('Failed to fetch report after upload', e);
+        }
+      }
+    } catch (e: any) {
+      console.error('Upload failed', e);
+      alert('Upload failed: ' + (e.message || e));
+    } finally {
       setIsProcessing(false);
       setUploadProgress(0);
-      
-      const mockResults = {
-        totalMiningArea: 420.5 + Math.random() * 100,
-        authorizedArea: 350.2 + Math.random() * 50,
-        illegalArea: 45.3 + Math.random() * 25,
-        estimatedDepth: 12.5 + Math.random() * 10,
-        estimatedVolume: 6000 + Math.random() * 2000,
-        lastAnalysisDate: new Date().toISOString().split('T')[0],
-        riskLevel: Math.random() > 0.5 ? 'High' : 'Medium'
-      };
-      
-      onDataUploaded(mockResults);
-    }, 1000);
+    }
   };
 
   const supportedFormats = {

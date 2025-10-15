@@ -66,11 +66,13 @@ export function BoundaryManager() {
     },
   ]);
 
-  const [newBoundary, setNewBoundary] = useState({
-    name: "",
-    type: "Authorized",
-    file: null,
-  });
+  const [newBoundary, setNewBoundary] = useState<{ name: string; type: string; file: File | null }>(
+    {
+      name: "",
+      type: "Authorized",
+      file: null,
+    }
+  );
 
   // For file upload inside "Upload New"
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -84,28 +86,64 @@ export function BoundaryManager() {
   ) => {
     const files = event.target.files;
     if (!files?.length) return;
-
     setIsProcessing(true);
+    setUploadProgress(5);
+    // store the file locally so Add Boundary becomes enabled
+    setNewBoundary({ ...newBoundary, file: files[0], name: newBoundary.name || files[0].name.replace(/\.[^/.]+$/, '') });
 
-    // Simulate upload
-    for (let i = 0; i <= 100; i += 10) {
-      setUploadProgress(i);
-      await new Promise((resolve) => setTimeout(resolve, 200));
-    }
+    const fd = new FormData();
+    fd.append('name', files[0].name.replace(/\.[^/.]+$/, ''));
+    fd.append('file', files[0]);
 
-    const newFile = {
-      name: files[0].name,
-      type: fileType,
-      size: files[0].size,
-      uploadedAt: new Date().toISOString(),
-      status: "processed",
-    };
+    try {
+      // progressive UI
+      for (let i = 5; i <= 40; i += 10) {
+        setUploadProgress(i);
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((r) => setTimeout(r, 150));
+      }
 
-    setUploadedFiles((prev) => [...prev, newFile]);
-    setTimeout(() => {
+      // upload to backend (best-effort; this mirrors DataUpload behavior)
+      // import api locally to avoid circular import at top-level
+      const api = await import('../lib/api');
+      const resp = await api.default.uploadRegion(fd);
+      setUploadProgress(90);
+
+      // add to uploadedFiles list for UI
+      const newFile = {
+        name: files[0].name,
+        type: fileType,
+        size: files[0].size,
+        uploadedAt: new Date().toISOString(),
+        status: 'processed',
+      };
+      setUploadedFiles((prev) => [...prev, newFile]);
+
+      // optionally, you could update boundaries list with server region
+      if (resp && resp.region) {
+        const r = resp.region;
+        setBoundaries((prev) => [
+          ...prev,
+          {
+            id: r.id,
+            name: r.name || newFile.name,
+            type: newBoundary.type,
+            area: r.area_km2 ? +(r.area_km2 * 100).toFixed(2) : Math.random() * 100,
+            coordinates: '',
+            status: 'Active',
+            uploadDate: new Date().toISOString().split('T')[0],
+            format: files[0].name.includes('.kml') ? 'KML' : 'Shapefile',
+            violations: 0,
+          },
+        ]);
+      }
+    } catch (e) {
+      console.warn('Boundary upload failed', e);
+      alert('Upload failed: ' + (e as any).message || e);
+    } finally {
       setIsProcessing(false);
       setUploadProgress(0);
-    }, 1000);
+    }
   };
 
   const addBoundary = () => {

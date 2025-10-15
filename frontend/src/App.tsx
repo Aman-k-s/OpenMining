@@ -10,11 +10,13 @@ import { InteractiveMap } from './components/InteractiveMap';
 import { Visualization3D } from './components/Visualization3D';
 import { ReportGenerator } from './components/ReportGenerator';
 import { BoundaryManager } from './components/BoundaryManager';
+import api from './lib/api';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [analysisData, setAnalysisData] = useState<any>(null);
   const [illegalMiningDetected, setIllegalMiningDetected] = useState(false);
+  const [regions, setRegions] = useState<any[] | null>(null);
 
   // Mock analysis results
   const mockAnalysisResults = {
@@ -28,11 +30,45 @@ function App() {
   };
 
   useEffect(() => {
-    // Simulate initial data load
-    setTimeout(() => {
-      setAnalysisData(mockAnalysisResults);
-      setIllegalMiningDetected(mockAnalysisResults.illegalArea > 0);
-    }, 1000);
+    // Fetch regions and then report for the first region
+    let mounted = true;
+    api
+      .listRegions()
+      .then((rs: any[]) => {
+        if (!mounted) return;
+        setRegions(rs);
+        const firstRegion = rs && rs.length ? rs[0] : null;
+        if (firstRegion && firstRegion.id) {
+          return api.getRegionReport(firstRegion.id).then((r: any) => {
+            if (!mounted) return;
+            // map backend report structure to analysisData shape used by Dashboard
+            const rep = r.report && r.report[0] ? r.report[0] : null;
+            if (rep) {
+              const mapped = {
+                totalMiningArea: rep.area_km2 ? +(rep.area_km2 * 100).toFixed(2) : mockAnalysisResults.totalMiningArea,
+                authorizedArea: rep.area_km2 ? +(rep.area_km2 * 100 * 0.9).toFixed(2) : mockAnalysisResults.authorizedArea,
+                illegalArea: rep.area_km2 ? +(rep.area_km2 * 100 * 0.1).toFixed(2) : mockAnalysisResults.illegalArea,
+                estimatedDepth: rep.dem_mean ? +rep.dem_mean.toFixed(1) : mockAnalysisResults.estimatedDepth,
+                estimatedVolume: rep.volume_m3 ? +rep.volume_m3 : mockAnalysisResults.estimatedVolume,
+                lastAnalysisDate: new Date().toISOString().split('T')[0],
+                riskLevel: 'Medium',
+              };
+              setAnalysisData(mapped);
+              setIllegalMiningDetected(mapped.illegalArea > 0);
+            }
+          });
+        }
+      })
+      .catch((e) => {
+        console.warn('Failed loading regions:', e.message || e);
+        // fallback to mock
+        setAnalysisData(mockAnalysisResults);
+        setIllegalMiningDetected(mockAnalysisResults.illegalArea > 0);
+      });
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   return (
